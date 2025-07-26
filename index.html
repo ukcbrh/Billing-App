@@ -166,7 +166,14 @@
     </div>
     
     <!-- मोडल -->
-    <div id="bill-modal" class="modal"><div class="modal-content"><div class="printable-area" id="bill-to-print-container"></div><div class="modal-buttons no-print" style="margin-top: 20px;"><button id="sendWhatsAppBtn" style="background-color:#25D366;" data-lang-key="sendOnWhatsApp">WhatsApp पर भेजें</button><button id="printBillBtn" style="background-color:#27ae60;" data-lang-key="printBill">बिल प्रिंट करें</button><button id="closeBillModalBtn" style="background-color:#e74c3c;" data-lang-key="newBill">नया बिल</button></div></div></div>
+    <div id="bill-modal" class="modal"><div class="modal-content"><div class="printable-area" id="bill-to-print-container"></div><div class="modal-buttons no-print" style="margin-top: 20px; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
+        <button id="sendWhatsAppBtn" title="WhatsApp पर भेजें" style="background-color:#25D366; padding: 8px; line-height: 1; width:auto;">
+            <svg fill="white" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.894 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.523.074-.797.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.203 5.076 4.487.709.306 1.262.489 1.694.626.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+        </button>
+        <button id="shareBillImageBtn" style="background-color:#f39c12; width:auto;" data-lang-key="shareAsImage">इमेज शेयर करें</button>
+        <button id="printBillBtn" style="background-color:#27ae60; width:auto;" data-lang-key="printBill">बिल प्रिंट करें</button>
+        <button id="closeBillModalBtn" style="background-color:#e74c3c; width:auto;" data-lang-key="newBill">नया बिल</button>
+    </div></div></div>
     <div id="history-modal" class="modal"><div class="modal-content" style="max-width:600px;"><h3 data-lang-key="purchaseHistoryOf">का खरीद इतिहास</h3><div id="historyContainer" style="max-height: 400px; overflow-y: auto;"></div><button id="closeHistoryModalBtn" style="margin-top:20px; background-color:#e74c3c;" data-lang-key="close">बंद करें</button></div></div>
     
 <script>
@@ -189,17 +196,17 @@ document.addEventListener('DOMContentLoaded', () => {
             shopAddressLabel: "दुकान का पता:", phoneNumLabel: "फ़ोन नंबर:", emailIdLabel: "ईमेल आईडी:",
             paymentAndLogo: "भुगतान और लोगो", upiPlaceholder: "yourname@bank", shopLogoLabel: "दुकान का लोगो:",
             saveProfile: "प्रोफ़ाइल सेव करें", sendOnWhatsApp: "WhatsApp पर भेजें", printBill: "बिल प्रिंट करें",
-            newBill: "नया बिल", purchaseHistoryOf: "का खरीद इतिहास", close: "बंद करें",
+            shareAsImage: "इमेज शेयर करें", newBill: "नया बिल", purchaseHistoryOf: "का खरीद इतिहास", close: "बंद करें",
             invalidCredentials: "गलत क्रेडेंशियल।", emailExists: "यह ईमेल आईडी पहले से पंजीकृत है।", signupSuccess: "साइन अप सफल!",
             fillAllFields: "कृपया सभी फ़ील्ड में सही जानकारी दर्ज करें।", productAddedSuccess: "उत्पाद सफलतापूर्वक जोड़ा गया!",
             productUpdatedSuccess: "उत्पाद सफलतापूर्वक अपडेट किया गया!", quantityUpdatedSuccess: "उत्पाद की मात्रा अपडेट कर दी गई है!",
             selectProductFromList: "कृपया सूची से एक उत्पाद चुनें।", stockUnavailable: "स्टॉक में केवल {quantity} {unit} उपलब्ध है!",
             addItemsToBill: "बिल बनाने के लिए आइटम जोड़ें।", customerInfoRequired: "बिल बनाने के लिए ग्राहक का नाम और फ़ोन नंबर आवश्यक है।",
             profileSaved: "प्रोफ़ाइल सेव हो गया!", noBillToShare: "शेयर करने के लिए कोई बिल नहीं है।", preparing: "तैयार हो रहा है...",
-            imageCreationFailed: "इमेज बनाने में त्रुटि हुई।", imageDownloaded: "बिल की इमेज डाउनलोड हो गई है। कृपया इसे WhatsApp पर मैन्युअल रूप से साझा करें।",
+            imageCreationFailed: "इमेज बनाने में त्रुटि हुई।", imageDownloaded: "बिल की इमेज डाउनलोड हो गई है। कृपया इसे मैन्युअल रूप से साझा करें।",
             noPurchaseHistory: "इस ग्राहक के लिए कोई खरीद इतिहास नहीं मिला।", billNo: "बिल नं:", date: "तारीख:", total: "कुल:", viewBill: "बिल देखें",
             stockReport: "स्टॉक रिपोर्ट", customer: "ग्राहक:", name: "नाम:", mobile: "मोबाइल:", subTotalBill: "उप-योग:", discountBill: "डिस्काउंट:",
-            grandTotalBill: "कुल देय:", scanToPay: "भुगतान के लिए स्कैन करें", visitAgain: "Visit Again!",
+            grandTotalBill: "कुल देय:", scanToPay: "भुगतान के लिए स्कैन करें", visitAgain: "Visit Again!", thanksForShopping: "खरीदारी के लिए धन्यवाद!",
             editBtn: "संपादित करें", deleteBtn: "हटाएं", updateBtn: "अपडेट करें", deleteConfirm: "क्या आप वाकई इस उत्पाद को हटाना चाहते हैं?",
             backupRestoreTitle: "बैकअप और रिस्टोर", backupInstructions: "अपने सभी डेटा (उत्पाद, ग्राहक, बिल आदि) को एक फ़ाइल के रूप में डाउनलोड करने के लिए 'बैकअप बनाएं' पर क्लिक करें। इस फ़ाइल को सुरक्षित रखें। डेटा वापस पाने के लिए 'बैकअप से रिस्टोर करें' का उपयोग करें।",
             createBackup: "बैकअप बनाएं", restoreBackup: "बैकअप से रिस्टोर करें", restoreConfirm: "क्या आप वाकई रिस्टोर करना चाहते हैं? यह सभी मौजूदा डेटा को ओवरराइट कर देगा।",
@@ -221,7 +228,7 @@ document.addEventListener('DOMContentLoaded', () => {
             shopAddressLabel: "Shop Address:", phoneNumLabel: "Phone Number:", emailIdLabel: "Email ID:",
             paymentAndLogo: "Payment & Logo", upiPlaceholder: "yourname@bank", shopLogoLabel: "Shop Logo:",
             saveProfile: "Save Profile", sendOnWhatsApp: "Send on WhatsApp", printBill: "Print Bill",
-            newBill: "New Bill", purchaseHistoryOf: "'s Purchase History", close: "Close",
+            shareAsImage: "Share as Image", newBill: "New Bill", purchaseHistoryOf: "'s Purchase History", close: "Close",
             invalidCredentials: "Invalid credentials.", emailExists: "This email ID is already registered.", signupSuccess: "Sign up successful!",
             fillAllFields: "Please enter correct information in all fields.", productAddedSuccess: "Product added successfully!",
             productUpdatedSuccess: "Product updated successfully!", quantityUpdatedSuccess: "Product quantity has been updated!",
@@ -231,7 +238,7 @@ document.addEventListener('DOMContentLoaded', () => {
             imageCreationFailed: "Error creating image.", imageDownloaded: "Bill image has been downloaded. Please share it manually on WhatsApp.",
             noPurchaseHistory: "No purchase history found for this customer.", billNo: "Bill No:", date: "Date:", total: "Total:", viewBill: "View Bill",
             stockReport: "Stock Report", customer: "Customer:", name: "Name:", mobile: "Mobile:", subTotalBill: "Subtotal:", discountBill: "Discount:",
-            grandTotalBill: "Grand Total:", scanToPay: "Scan to Pay", visitAgain: "Visit Again!",
+            grandTotalBill: "Grand Total:", scanToPay: "Scan to Pay", visitAgain: "Visit Again!", thanksForShopping: "Thanks for shopping!",
             editBtn: "Edit", deleteBtn: "Delete", updateBtn: "Update", deleteConfirm: "Are you sure you want to delete this product?",
             backupRestoreTitle: "Backup & Restore", backupInstructions: "Click 'Create Backup' to download all your data (products, customers, bills, etc.) as a file. Keep this file safe. Use 'Restore from Backup' to recover your data.",
             createBackup: "Create Backup", restoreBackup: "Restore from Backup", restoreConfirm: "Are you sure you want to restore? This will overwrite all current data.",
@@ -253,17 +260,17 @@ document.addEventListener('DOMContentLoaded', () => {
             shopAddressLabel: "دکان کا پتہ:", phoneNumLabel: "فون نمبر:", emailIdLabel: "ای میل آئی ڈی:",
             paymentAndLogo: "ادائیگی اور لوگو", upiPlaceholder: "yourname@bank", shopLogoLabel: "دکان کا لوگو:",
             saveProfile: "پروفائل محفوظ کریں", sendOnWhatsApp: "WhatsApp پر بھیجیں", printBill: "بل پرنٹ کریں",
-            newBill: "نیا بل", purchaseHistoryOf: " کی خریداری کی تاریخ", close: "بند کریں",
+            shareAsImage: "تصویر شیئر کریں", newBill: "نیا بل", purchaseHistoryOf: " کی خریداری کی تاریخ", close: "بند کریں",
             invalidCredentials: "غلط اسناد۔", emailExists: "یہ ای میل آئی ڈی پہلے سے رجسٹرڈ ہے۔", signupSuccess: "کامیابی سے سائن اپ!",
             fillAllFields: "براہ کرم تمام خانوں میں صحیح معلومات درج کریں۔", productAddedSuccess: "پروڈکٹ کامیابی سے شامل کیا گیا!",
             productUpdatedSuccess: "پروڈکٹ کامیابی سے اپ ڈیٹ ہو گیا!", quantityUpdatedSuccess: "مصنوعات کی مقدار کو اپ ڈیٹ کر دیا گیا ہے!",
             selectProductFromList: "براہ کرم فہرست سے ایک پروڈکٹ منتخب کریں۔", stockUnavailable: "اسٹاک میں صرف {quantity} {unit} دستیاب ہے!",
-            addItemsToBill: "بل بنانے کے لیے آئٹمز شامل کریں۔", customerInfoRequired: "بل بنانے کے لیے صارف کا نام اور فون نمبر درکار ہے۔",
+            addItemsToBill: "بل بنانے کے لیے آئٹمز شامل کریں۔", customerInfoRequired: "بل بنانے کے लिए صارف کا نام اور फ़ोन नंबर आवश्यक है।",
             profileSaved: "پروفائل محفوظ ہوگیا!", noBillToShare: "شیئر کرنے کے لیے کوئی بل نہیں ہے۔", preparing: "تیار ہو رہا ہے...",
             imageCreationFailed: "تصویر بنانے میں خرابی۔", imageDownloaded: "بل کی تصویر ڈاؤن لوڈ ہو گئی ہے۔ براہ کرم اسے دستی طور پر WhatsApp پر شیئر کریں۔",
             noPurchaseHistory: "اس صارف کے لیے خریداری کی کوئی تاریخ نہیں ملی۔", billNo: "بل نمبر:", date: "تاریخ:", total: "کل:", viewBill: "بل دیکھیں",
             stockReport: "اسٹاک رپورٹ", customer: "صارف:", name: "نام:", mobile: "موبائل:", subTotalBill: "ذیلی کل:", discountBill: "رعایت:",
-            grandTotalBill: "کل قابل ادائیگی:", scanToPay: "ادائیگی کے لیے اسکین کریں", visitAgain: "دوبارہ تشریف لائیں!",
+            grandTotalBill: "کل قابل ادائیگی:", scanToPay: "ادائیگی کے لیے اسکین کریں", visitAgain: "دوبارہ تشریف لائیں!", thanksForShopping: "خریداری کے لئے شکریہ!",
             editBtn: "ترمیم", deleteBtn: "حذف کریں", updateBtn: "اپ ڈیٹ", deleteConfirm: "کیا آپ واقعی اس پروڈکٹ کو حذف کرنا چاہتے ہیں؟",
             backupRestoreTitle: "بیک اپ اور ریسٹور", backupInstructions: "اپنے تمام ڈیٹا (مصنوعات، صارفین، بل، وغیرہ) کو فائل کے طور پر ڈاؤن لوڈ کرنے کے لیے 'بیک اپ بنائیں' پر کلک کریں۔ اس فائل کو محفوظ رکھیں۔ اپنا ڈیٹا بازیافت کرنے کے لیے 'بیک اپ سے بحال کریں' کا استعمال کریں۔",
             createBackup: "بیک اپ بنائیں", restoreBackup: "بیک اپ سے بحال کریں", restoreConfirm: "کیا آپ واقعی بحال کرنا چاہتے ہیں؟ یہ تمام موجودہ ڈیٹا کو اوور رائٹ کر دے گا۔",
@@ -272,7 +279,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     
     // --- ग्लोबल वेरिएबल्स ---
-    let allRetailerData = {}, currentUserEmail = null, currentBillItems = [], billCounter = 1, selectedProductForBill = null, currentLanguage = 'hi', editingProductId = null;
+    let allRetailerData = {}, currentUserEmail = null, currentBillItems = [], billCounter = 1, selectedProductForBill = null, currentLanguage = 'hi', editingProductId = null, currentBillForModal = null;
     const app = {}; window.app = app;
     
     // --- भाषा फंक्शन ---
@@ -294,6 +301,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         document.getElementById('language-select').value = lang;
+        const whatsappBtn = document.getElementById('sendWhatsAppBtn');
+        if (whatsappBtn) {
+            whatsappBtn.title = translations[lang].sendOnWhatsApp;
+        }
         // UI के डायनामिक हिस्सों को फिर से रेंडर करें
         if (currentUserEmail) {
             renderAllUI();
@@ -558,7 +569,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const gstValue = bill.subTotal - bill.discountAmount > 0 ? (100 * bill.gstAmount / (bill.subTotal - bill.discountAmount)).toFixed(2) : 0;
         
         return `<div id="bill-to-print" style="background-color: ${billBgColor}; color: ${billTextColor}; padding: 15px; direction: ${document.documentElement.dir};">
-            <div style="text-align:center; font-family:'Courier New';"><img src="${retailer.shopDetails.logo || ''}" style="max-height:80px;"><h3 style="margin:5px 0;">${retailer.shopDetails.name}</h3><p style="margin:2px 0;">${retailer.shopDetails.address}</p><p style="margin:2px 0;">${lang.phoneColumn}: ${retailer.shopDetails.phone}</p><p style="margin:2px 0;">${lang.billNo} ${bill.billNo}</p><p style="margin:2px 0;">${lang.date}: ${bill.date} | ${bill.time}</p></div><hr style="border:1px dashed #333;"><div class="bill-customer-info" style="font-family:'Courier New';"><h4 style="margin:0; text-align:${document.documentElement.dir === 'rtl' ? 'right' : 'left'};">${lang.customer}:</h4><p><strong>${lang.name}:</strong> ${customer.name}</p><p><strong>${lang.mobile}:</strong> ${customer.phone}</p></div><hr style="border:1px dashed #333;"><table style="width:100%; font-size:14px; border-collapse:collapse; font-family:'Courier New';"><thead><tr><th>${lang.productColumn}</th><th>${lang.quantityColumn}</th><th>${lang.totalColumn}</th></tr></thead><tbody>${bill.items.map(item => `<tr><td>${item.name}</td><td>${item.quantity} ${item.unit}</td><td>₹${item.total.toFixed(2)}</td></tr>`).join('')}</tbody></table><hr style="border:1px dashed #333;"><div style="font-family:'Segoe UI';"><div class="bill-summary-row"><span>${lang.subTotalBill}</span><span>₹${bill.subTotal.toFixed(2)}</span></div><div class="bill-summary-row"><span>${lang.discountBill}</span><span>- ₹${bill.discountAmount.toFixed(2)}</span></div><div class="bill-summary-row"><span>GST (${gstValue}%):</span><span>+ ₹${bill.gstAmount.toFixed(2)}</span></div><div class="bill-summary-row grand-total" style="border-top-color: #333;"><span>${lang.grandTotalBill}</span><span>₹${bill.total.toFixed(2)}</span></div></div><p style="text-align:center;font-weight:bold;">${lang.scanToPay}</p><img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(`upi://pay?pa=${retailer.shopDetails.upiId}&pn=${encodeURIComponent(retailer.shopDetails.name)}&am=${bill.total.toFixed(2)}&cu=INR&tn=BillNo${bill.billNo}`)}" alt="UPI QR Code" style="display:block;margin:15px auto;width:160px;height:160px;"><div style="text-align:center;margin-top:20px;"><p>${lang.visitAgain}</p></div>
+            <div style="text-align:center; font-family:'Courier New';"><img src="${retailer.shopDetails.logo || ''}" style="max-height:80px;"><h3 style="margin:5px 0;">${retailer.shopDetails.name}</h3><p style="margin:2px 0;">${retailer.shopDetails.address}</p><p style="margin:2px 0;">${lang.phoneColumn}: ${retailer.shopDetails.phone}</p><p style="margin:2px 0;">${lang.billNo} ${bill.billNo}</p><p style="margin:2px 0;">${lang.date}: ${bill.date} | ${bill.time}</p></div><hr style="border:1px dashed #333;"><div class="bill-customer-info" style="font-family:'Courier New';"><h4 style="margin:0; text-align:${document.documentElement.dir === 'rtl' ? 'right' : 'left'};">${lang.customer}:</h4><p><strong>${lang.name}:</strong> ${customer.name}</p><p><strong>${lang.mobile}:</strong> ${customer.phone}</p></div><hr style="border:1px dashed #333;"><table style="width:100%; font-size:14px; border-collapse:collapse; font-family:'Courier New';"><thead><tr><th>${lang.productColumn}</th><th>${lang.quantityColumn}</th><th>${lang.totalColumn}</th></tr></thead><tbody>${bill.items.map(item => `<tr><td>${item.name}</td><td>${item.quantity} ${item.unit}</td><td>₹${item.total.toFixed(2)}</td></tr>`).join('')}</tbody></table><hr style="border:1px dashed #333;"><div style="font-family:'Segoe UI';"><div class="bill-summary-row"><span>${lang.subTotalBill}</span><span>₹${bill.subTotal.toFixed(2)}</span></div><div class="bill-summary-row"><span>${lang.discountBill}</span><span>- ₹${bill.discountAmount.toFixed(2)}</span></div><div class="bill-summary-row"><span>GST (${gstValue}%):</span><span>+ ₹${bill.gstAmount.toFixed(2)}</span></div><div class="bill-summary-row grand-total" style="border-top-color: #333;"><span>${lang.grandTotalBill}</span><span>₹${bill.total.toFixed(2)}</span></div></div><p style="text-align:center;font-weight:bold;">${lang.scanToPay}</p><img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(`upi://pay?pa=${retailer.shopDetails.upiId}&pn=${encodeURIComponent(retailer.shopDetails.name)}&am=${bill.total.toFixed(2)}&cu=INR&tn=BillNo${bill.billNo}`)}" alt="UPI QR Code" style="display:block;margin:15px auto;width:160px;height:160px;"><div style="text-align:center;margin-top:20px;"><p>${lang.visitAgain} ${lang.thanksForShopping}</p></div>
         </div>`;
     };
 
@@ -605,6 +616,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const newBill = { billNo: billCounter, customerId: customerForBill.id, date: billDate, time: billTime, items: JSON.parse(JSON.stringify(currentBillItems)), subTotal, discountAmount, gstAmount, total: finalTotal };
         retailer.bills.push(newBill);
         
+        currentBillForModal = newBill; // वर्तमान बिल को शेयरिंग के लिए सेट करें
+
         currentBillItems.forEach(item => { retailer.inventory.find(p => p.id === item.id).quantity -= item.quantity; });
         
         const billModalContent = document.getElementById('bill-to-print-container');
@@ -648,6 +661,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const customer = retailer.customers.find(c => c.id == bill.customerId);
 
         if (bill && customer) {
+            currentBillForModal = bill; // रीप्रिंट बिल को शेयरिंग के लिए सेट करें
             document.getElementById('bill-to-print-container').innerHTML = app.generateBillHTML(bill, retailer, customer);
             document.getElementById('history-modal').style.display = 'none';
             document.getElementById('bill-modal').style.display = 'block';
@@ -817,7 +831,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 calculateFinalTotal();
             }
-            e.target.dataset.isReprint = "false"; 
+            e.target.dataset.isReprint = "false";
+            currentBillForModal = null; // मोडल बंद होने पर बिल क्लियर करें
         });
         
         document.getElementById('closeHistoryModalBtn').addEventListener('click', () => {
@@ -825,12 +840,53 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         document.getElementById('sendWhatsAppBtn').addEventListener('click', () => {
-            const billElement = document.getElementById('bill-to-print');
-            if (!billElement) { alert(translations[currentLanguage].noBillToShare); return; }
+            const lang = translations[currentLanguage];
+            if (!currentBillForModal) {
+                alert(lang.noBillToShare);
+                return;
+            }
 
-            const button = document.getElementById('sendWhatsAppBtn');
+            const bill = currentBillForModal;
+            const retailer = allRetailerData[currentUserEmail];
+            const customer = retailer.customers.find(c => c.id == bill.customerId);
+
+            if (!retailer || !customer) {
+                alert(lang.noBillToShare);
+                return;
+            }
+
+            const shopName = retailer.shopDetails.name;
+            let message = `*${shopName}*\n\n`;
+            message += `*${lang.customer}:* ${customer.name}\n`;
+            message += `*${lang.mobile}:* ${customer.phone}\n\n`;
+            message += `*${lang.billNo}:* ${bill.billNo}\n`;
+            message += `*${lang.date}:* ${bill.date} ${bill.time}\n`;
+            message += `----------------------------------\n`;
+            message += bill.items.map(item =>
+                `${item.name} (${item.quantity} ${item.unit}) - ₹${item.total.toFixed(2)}`
+            ).join('\n');
+            message += `\n----------------------------------\n`;
+            message += `${lang.subTotalBill} ₹${bill.subTotal.toFixed(2)}\n`;
+            message += `${lang.discountBill} -₹${bill.discountAmount.toFixed(2)}\n`;
+            const gstValue = bill.subTotal - bill.discountAmount > 0 ? (100 * bill.gstAmount / (bill.subTotal - bill.discountAmount)).toFixed(2) : 0;
+            message += `GST (${gstValue}%): +₹${bill.gstAmount.toFixed(2)}\n\n`;
+            message += `*${lang.grandTotalBill}* *₹${bill.total.toFixed(2)}*\n\n`;
+            message += `${lang.visitAgain} ${lang.thanksForShopping}`;
+
+            const encodedMessage = encodeURIComponent(message);
+            const customerPhone = customer.phone.replace(/[^0-9]/g, '');
+            const whatsappUrl = `https://wa.me/${customerPhone}?text=${encodedMessage}`;
+            window.open(whatsappUrl, '_blank');
+        });
+
+        document.getElementById('shareBillImageBtn').addEventListener('click', () => {
+            const billElement = document.getElementById('bill-to-print');
+            const lang = translations[currentLanguage];
+            if (!billElement) { alert(lang.noBillToShare); return; }
+
+            const button = document.getElementById('shareBillImageBtn');
             const originalText = button.innerText;
-            button.innerText = translations[currentLanguage].preparing;
+            button.innerText = lang.preparing;
             button.disabled = true;
 
             html2canvas(billElement, { scale: 2, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
@@ -840,10 +896,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (navigator.canShare && navigator.canShare({ files: [file] })) {
                         navigator.share({
                             files: [file],
-                            title: translations[currentLanguage].currentBill,
-                            text: translations[currentLanguage].customerDetails
+                            title: lang.currentBill,
+                            text: lang.customerDetails
                         })
-                        .finally(() => { button.innerText = originalText; button.disabled = false; });
+                        .finally(() => { button.innerText = originalText; button.disabled = false; setLanguage(currentLanguage); });
                     } else {
                         const link = document.createElement('a');
                         link.href = URL.createObjectURL(blob);
@@ -851,14 +907,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         document.body.appendChild(link);
                         link.click();
                         document.body.removeChild(link);
-                        alert(translations[currentLanguage].imageDownloaded);
-                        button.innerText = originalText; button.disabled = false;
+                        alert(lang.imageDownloaded);
+                        button.innerText = originalText; button.disabled = false; setLanguage(currentLanguage);
                     }
                 }, 'image/png');
             }).catch(err => {
                 console.error("Oops, something went wrong!", err);
-                alert(translations[currentLanguage].imageCreationFailed);
-                button.innerText = originalText; button.disabled = false;
+                alert(lang.imageCreationFailed);
+                button.innerText = originalText; button.disabled = false; setLanguage(currentLanguage);
             });
         });
 
