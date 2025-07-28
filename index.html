@@ -30,17 +30,18 @@
         }
         body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; background-color: var(--bg-color); color: var(--text-color); transition: background-color 0.3s, color 0.3s; }
         /* RTL सपोर्ट */
-        [dir="rtl"] label, [dir="rtl"] h4, [dir="rtl"] p { text-align: right; }
+        [dir="rtl"] label, [dir="rtl"] h4, [dir="rtl"] p, [dir="rtl"] h5 { text-align: right; }
         [dir="rtl"] .bill-summary-row { justify-content: flex-end; }
         [dir="rtl"] .bill-summary-row span:first-child { margin-left: 10px; }
         [dir="rtl"] .bill-summary-row span:last-child { margin-left: 0; margin-right: auto; }
+        [dir="rtl"] .forgot-password { text-align: left; }
 
         .container { max-width: 1100px; margin: 20px auto; background: var(--container-bg); padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px var(--shadow-color); transition: background-color 0.3s; }
         .form-container { max-width: 500px; }
         .hidden { display: none; }
         h1, h2, h3, h4 { color: var(--text-color); text-align: center; margin-top: 0; }
         h2 { border-bottom: 2px solid var(--primary-color); padding-bottom: 10px; }
-        h4 { text-align: left; border-bottom: 1px solid var(--border-color); padding-bottom: 5px; }
+        h4, h5 { text-align: left; border-bottom: 1px solid var(--border-color); padding-bottom: 5px; margin-bottom: 10px; }
         label { display: block; margin-bottom: 8px; font-weight: bold; text-align: left; }
         input, select, textarea { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid var(--border-color); border-radius: 4px; box-sizing: border-box; background-color: var(--input-bg); color: var(--text-color); }
         button { background-color: var(--primary-color); color: white; padding: 12px 20px; border: none; border-radius: 4px; cursor: pointer; width: 100%; font-size: 16px; margin-top: 10px; }
@@ -49,6 +50,7 @@
         .action-button { width: auto; padding: 5px 10px; font-size: 14px; margin-right: 5px; }
         .action-button.edit { background-color: #f39c12; }
         .action-button.delete { background-color: #e74c3c; }
+        .action-button.view { background-color: #27ae60; }
         .app-tabs { display: flex; flex-wrap: wrap; border-bottom: 1px solid var(--border-color); margin-bottom: 20px; }
         .tab-link { padding: 10px 20px; cursor: pointer; border-bottom: 3px solid transparent; }
         .tab-link.active { border-bottom-color: var(--primary-color); }
@@ -59,7 +61,7 @@
         .data-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         .data-table th, .data-table td { border: 1px solid var(--border-color); padding: 8px; text-align: left; }
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); }
-        .modal-content { background-color: var(--container-bg); margin: 5% auto; padding: 20px; border: 1px solid #888; width: 90%; max-width: 450px; font-family: 'Segoe UI', sans-serif; border-radius: 8px; }
+        .modal-content { background-color: var(--container-bg); margin: 5% auto; padding: 20px; border: 1px solid #888; width: 90%; max-width: 700px; font-family: 'Segoe UI', sans-serif; border-radius: 8px; }
         body.dark-mode .modal-content { border-color: #555; }
         .bill-summary-row { display: flex; justify-content: space-between; font-size: 1.1em; padding: 5px 0; }
         .bill-summary-row.grand-total { font-weight: bold; font-size: 1.3em; border-top: 2px solid var(--text-color); margin-top: 10px; padding-top: 10px;}
@@ -78,6 +80,11 @@
         input:checked + .slider:before { transform: translateX(26px); }
         .backup-container { padding: 20px; text-align: center; border: 2px dashed var(--border-color); border-radius: 8px; }
         .backup-container button { width: auto; max-width: 250px; }
+        .report-section { border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .report-section button { width: auto; font-size: 14px; padding: 8px 15px; margin-right: 10px; }
+        .forgot-password { text-align: right; margin-top: -10px; margin-bottom: 15px; }
+        .forgot-password a { color: var(--primary-color); text-decoration: none; font-size: 0.9em; }
+        .purchase-form-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1.5fr; gap: 10px; align-items: center;}
         @media print { body * { visibility: hidden; } .printable-area, .printable-area * { visibility: visible; } .printable-area { position: absolute; left: 0; top: 0; margin: 0; padding: 20px; color: #000 !important; } .no-print { display: none; } #bill-to-print-container { background-color: #fff !important; } }
     </style>
 </head>
@@ -95,8 +102,29 @@
         </div>
     </div>
     <div id="signup-page" class="container form-container hidden"><button class="back-btn" id="signupBackBtn" data-lang-key="back">← वापस</button><h2 data-lang-key="createAccount">नया अकाउंट बनाएं</h2><form id="signupForm"><label data-lang-key="shopNameLabel">दुकान का नाम:</label><input type="text" id="signupShopName" required><label data-lang-key="emailLabel">ईमेल:</label><input type="email" id="signupEmail" required><label data-lang-key="mobileLabel">मोबाइल:</label><input type="tel" id="signupPhone" required><label data-lang-key="passwordLabel">पासवर्ड:</label><input type="password" id="signupPassword" required><button type="submit" data-lang-key="signUp">साइन अप</button></form></div>
-    <div id="login-page" class="container form-container hidden"><button class="back-btn" id="loginBackBtn" data-lang-key="back">← वापस</button><h2 data-lang-key="login">लॉगिन करें</h2><form id="loginForm"><label data-lang-key="emailOrMobileLabel">ईमेल या मोबाइल:</label><input type="text" id="loginIdentifier" required><label data-lang-key="passwordLabel">पासवर्ड:</label><input type="password" id="loginPassword" required><button type="submit" data-lang-key="login">लॉगिन करें</button></form></div>
+    <div id="login-page" class="container form-container hidden"><button class="back-btn" id="loginBackBtn" data-lang-key="back">← वापस</button><h2 data-lang-key="login">लॉगिन करें</h2><form id="loginForm"><label data-lang-key="emailOrMobileLabel">ईमेल या मोबाइल:</label><input type="text" id="loginIdentifier" required><label data-lang-key="passwordLabel">पासवर्ड:</label><input type="password" id="loginPassword" required><div class="forgot-password"><a href="#" id="forgotPasswordLink" data-lang-key="forgotPassword">पासवर्ड भूल गए?</a></div><button type="submit" data-lang-key="login">लॉगिन करें</button></form></div>
     
+    <div id="reset-password-page" class="container form-container hidden">
+        <button class="back-btn" id="resetBackBtn" data-lang-key="back">← वापस</button>
+        <h2 data-lang-key="resetPasswordTitle">पासवर्ड रीसेट करें</h2>
+        <form id="resetPasswordForm">
+            <p data-lang-key="enterRegisteredEmail" style="text-align:left; border:none; margin-bottom:10px; font-size:0.9em;">अपना पंजीकृत ईमेल दर्ज करें।</p>
+            <label data-lang-key="emailLabel">ईमेल:</label>
+            <input type="email" id="resetEmail" required>
+            <button type="button" id="verifyEmailBtn" data-lang-key="verifyEmail">ईमेल सत्यापित करें</button>
+            <div id="newPasswordSection" class="hidden" style="margin-top: 20px; border-top: 1px solid var(--border-color); padding-top:20px;">
+                <p data-lang-key="enterRegisteredMobile" style="text-align:left; border:none; margin-bottom:10px; font-size:0.9em;">पहचान सत्यापित करने के लिए अपना पंजीकृत मोबाइल नंबर दर्ज करें।</p>
+                <label data-lang-key="mobileLabel">मोबाइल:</label>
+                <input type="tel" id="resetPhone" required>
+                <label data-lang-key="newPassword">नया पासवर्ड:</label>
+                <input type="password" id="resetNewPassword" required>
+                <label data-lang-key="confirmPassword">पासवर्ड की पुष्टि करें:</label>
+                <input type="password" id="resetConfirmPassword" required>
+                <button type="submit" id="resetPasswordBtn" data-lang-key="resetPasswordBtnText">पासवर्ड रीसेट करें</button>
+            </div>
+        </form>
+    </div>
+
     <!-- मुख्य एप्लीकेशन -->
     <div id="main-app" class="container hidden">
         <div style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 15px;">
@@ -110,7 +138,7 @@
         </div>
         <h2 id="retailerShopName"></h2>
         <hr>
-        <div class="app-tabs" id="appTabsContainer"><span class="tab-link active" data-tab="billing" data-lang-key="billingTab">बिलिंग</span><span class="tab-link" data-tab="inventory" data-lang-key="inventoryTab">इन्वेंटरी</span><span class="tab-link" data-tab="customers" data-lang-key="customersTab">ग्राहक</span><span class="tab-link" data-tab="profile" data-lang-key="profileTab">प्रोफ़ाइल</span><span class="tab-link" data-tab="backup" data-lang-key="backupRestoreTab">बैकअप/रिस्टोर</span></div>
+        <div class="app-tabs" id="appTabsContainer"><span class="tab-link active" data-tab="billing" data-lang-key="billingTab">बिलिंग</span><span class="tab-link" data-tab="inventory" data-lang-key="inventoryTab">इन्वेंटरी</span><span class="tab-link" data-tab="suppliers" data-lang-key="suppliersTab">आपूर्तिकर्ता</span><span class="tab-link" data-tab="customers" data-lang-key="customersTab">ग्राहक</span><span class="tab-link" data-tab="analysis" data-lang-key="analysisTab">विश्लेषण</span><span class="tab-link" data-tab="reports" data-lang-key="reportsTab">रिपोर्ट्स</span><span class="tab-link" data-tab="profile" data-lang-key="profileTab">प्रोफ़ाइल</span><span class="tab-link" data-tab="backup" data-lang-key="backupRestoreTab">बैकअप/रिस्टोर</span></div>
         <div id="billing-tab" class="tab-content active">
              <div class="main-layout">
                 <div>
@@ -151,8 +179,99 @@
                 </div>
             </div>
         </div>
-        <div id="inventory-tab" class="tab-content"><div class="main-layout"><div><h4 data-lang-key="addProduct">नया उत्पाद जोड़ें</h4><form id="stockForm"><label data-lang-key="productName">उत्पाद का नाम:</label><input type="text" id="productName" required><div style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px;"><div><label data-lang-key="priceLabel">मूल्य (₹):</label><input type="number" id="productPrice" required></div><div><label data-lang-key="unitLabel">इकाई:</label><select id="productUnit"><option>Pcs</option><option>Kg</option><option>Gm</option><option>Ltr</option><option>Mtr</option></select></div></div><label data-lang-key="stockQuantity">स्टॉक मात्रा:</label><input type="number" id="productQuantity" required><button type="submit" id="stockSubmitBtn" data-lang-key="addToStock">स्टॉक में जोड़ें</button></form></div><div id="inventoryToPrint"><h4 data-lang-key="currentStock">वर्तमान स्टॉक</h4><table class="data-table"><thead><tr><th data-lang-key="productColumn">उत्पाद</th><th data-lang-key="priceColumn">मूल्य</th><th data-lang-key="inStock">स्टॉक में</th><th data-lang-key="actionColumn">एक्शन</th></tr></thead><tbody id="stockTableBody"></tbody></table><div style="display:flex; gap:15px; margin-top:20px;" class="no-print"><button id="printStockBtn" data-lang-key="printStock">स्टॉक प्रिंट करें</button><button id="saveStockPdfBtn" data-lang-key="saveAsPdf">PDF के रूप में सहेजें</button></div></div></div></div>
+        <div id="inventory-tab" class="tab-content"><div class="main-layout"><div><h4 data-lang-key="addProduct">नया उत्पाद जोड़ें</h4><form id="stockForm"><label data-lang-key="productName">उत्पाद का नाम:</label><input type="text" id="productName" required><div style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px;"><div><label data-lang-key="priceLabel">बिक्री मूल्य (₹):</label><input type="number" id="productPrice" required></div><div><label data-lang-key="unitLabel">इकाई:</label><select id="productUnit"><option>Pcs</option><option>Kg</option><option>Gm</option><option>Ltr</option><option>Mtr</option></select></div></div><label data-lang-key="stockQuantity">स्टॉक मात्रा:</label><input type="number" id="productQuantity" required><button type="submit" id="stockSubmitBtn" data-lang-key="addToStock">स्टॉक में जोड़ें</button></form></div><div id="inventoryToPrint"><h4 data-lang-key="currentStock">वर्तमान स्टॉक</h4><table class="data-table"><thead><tr><th data-lang-key="productColumn">उत्पाद</th><th data-lang-key="priceColumn">बिक्री मूल्य</th><th data-lang-key="inStock">स्टॉक में</th><th data-lang-key="actionColumn">एक्शन</th></tr></thead><tbody id="stockTableBody"></tbody></table><div style="display:flex; gap:15px; margin-top:20px;" class="no-print"><button id="printStockBtn" data-lang-key="printStock">स्टॉक प्रिंट करें</button><button id="saveStockPdfBtn" data-lang-key="saveAsPdf">PDF के रूप में सहेजें</button></div></div></div></div>
+        
+        <!-- नया आपूर्तिकर्ता टैब -->
+        <div id="suppliers-tab" class="tab-content">
+            <div class="main-layout">
+                <div>
+                    <h4 data-lang-key="addSupplier">नया आपूर्तिकर्ता जोड़ें</h4>
+                    <form id="addSupplierForm">
+                        <label data-lang-key="supplierName">आपूर्तिकर्ता का नाम:</label>
+                        <input type="text" id="supplierName" required>
+                        <label data-lang-key="supplierPhone">आपूर्तिकर्ता का फ़ोन:</label>
+                        <input type="tel" id="supplierPhone" required>
+                        <label data-lang-key="supplierAddress">आपूर्तिकर्ता का पता:</label>
+                        <textarea id="supplierAddress" rows="2"></textarea>
+                        <button type="submit" id="supplierSubmitBtn" data-lang-key="addSupplierBtn">आपूर्तिकर्ता जोड़ें</button>
+                    </form>
+                </div>
+                <div>
+                    <h4 data-lang-key="supplierList">आपूर्तिकर्ताओं की सूची</h4>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th data-lang-key="nameColumn">नाम</th>
+                                <th data-lang-key="phoneColumn">फ़ोन</th>
+                                <th data-lang-key="actionColumn">एक्शन</th>
+                            </tr>
+                        </thead>
+                        <tbody id="supplierTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
         <div id="customers-tab" class="tab-content"><h4 data-lang-key="customerList">ग्राहकों की सूची</h4><table class="data-table"><thead><tr><th data-lang-key="nameColumn">नाम</th><th data-lang-key="phoneColumn">फ़ोन</th><th data-lang-key="actionColumn">एक्शन</th></tr></thead><tbody id="customerTableBody"></tbody></table></div>
+        
+        <div id="analysis-tab" class="tab-content">
+            <h4 data-lang-key="salesAnalysisTitle">बिक्री विश्लेषण</h4>
+            <div id="analysis-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                <div class="analysis-card" style="background: var(--input-bg); padding: 15px; border-radius: 8px; box-shadow: 0 1px 4px var(--shadow-color); text-align: center;">
+                    <h5 data-lang-key="totalRevenue">कुल राजस्व</h5>
+                    <p style="font-size: 1.5em; font-weight: bold; color: var(--primary-color);" id="totalRevenueDisplay">₹0.00</p>
+                </div>
+                <div class="analysis-card" style="background: var(--input-bg); padding: 15px; border-radius: 8px; box-shadow: 0 1px 4px var(--shadow-color); text-align: center;">
+                    <h5 data-lang-key="totalBillsGenerated">कुल बिल</h5>
+                    <p style="font-size: 1.5em; font-weight: bold;" id="totalBillsDisplay">0</p>
+                </div>
+                <div class="analysis-card" style="background: var(--input-bg); padding: 15px; border-radius: 8px; box-shadow: 0 1px 4px var(--shadow-color); text-align: center;">
+                    <h5 data-lang-key="currentStockValue">वर्तमान स्टॉक मूल्य</h5>
+                    <p style="font-size: 1.5em; font-weight: bold;" id="stockValueDisplay">₹0.00</p>
+                </div>
+            </div>
+            <div style="margin-top: 30px;">
+                <h4 data-lang-key="topSellingProducts">सबसे ज्यादा बिकने वाले उत्पाद</h4>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th data-lang-key="productColumn">उत्पाद</th>
+                            <th data-lang-key="quantitySold">बिकी हुई मात्रा</th>
+                        </tr>
+                    </thead>
+                    <tbody id="topSellingTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="reports-tab" class="tab-content">
+            <h4 data-lang-key="downloadReportsTitle">रिपोर्ट्स डाउनलोड करें</h4>
+            <div class="report-section">
+                <h5 data-lang-key="salesReportTitle">बिक्री रिपोर्ट</h5>
+                <p data-lang-key="salesReportDesc" style="border:none; margin-bottom:15px; text-align:left;">एक तिथि सीमा के भीतर सभी बिलों की विस्तृत सूची डाउनलोड करें।</p>
+                <div style="display: flex; flex-wrap:wrap; gap: 15px; align-items: center; margin-bottom: 15px;">
+                     <label data-lang-key="fromDate" style="width:auto; margin-bottom:0;">से:</label>
+                     <input type="date" id="salesReportFromDate" style="width:150px; margin-bottom:0;">
+                     <label data-lang-key="toDate" style="width:auto; margin-bottom:0;">तक:</label>
+                     <input type="date" id="salesReportToDate" style="width:150px; margin-bottom:0;">
+                </div>
+                <button id="downloadSalesPdfBtn" data-lang-key="downloadAsPdf">PDF में डाउनलोड करें</button>
+                <button id="downloadSalesCsvBtn" data-lang-key="downloadAsCsv">CSV में डाउनलोड करें</button>
+            </div>
+             <div class="report-section">
+                <h5 data-lang-key="stockReportTitle">स्टॉक रिपोर्ट</h5>
+                <p data-lang-key="stockReportDesc" style="border:none; margin-bottom:15px; text-align:left;">वर्तमान में उपलब्ध सभी उत्पादों की सूची डाउनलोड करें।</p>
+                <button id="downloadStockReportPdfBtn" data-lang-key="downloadAsPdf">PDF में डाउनलोड करें</button>
+                 <button id="downloadStockReportCsvBtn" data-lang-key="downloadAsCsv">CSV में डाउनलोड करें</button>
+            </div>
+             <div class="report-section">
+                <h5 data-lang-key="customerListTitle">ग्राहक सूची रिपोर्ट</h5>
+                <p data-lang-key="customerListDesc" style="border:none; margin-bottom:15px; text-align:left;">अपने सभी पंजीकृत ग्राहकों की सूची डाउनलोड करें।</p>
+                <button id="downloadCustomersPdfBtn" data-lang-key="downloadAsPdf">PDF में डाउनलोड करें</button>
+                 <button id="downloadCustomersCsvBtn" data-lang-key="downloadAsCsv">CSV में डाउनलोड करें</button>
+            </div>
+        </div>
+
         <div id="profile-tab" class="tab-content"><div class="profile-layout" style="grid-template-columns: 1fr 1fr; gap: 30px;"><div><h4 data-lang-key="shopDetails">दुकान का विवरण</h4><label data-lang-key="shopNameLabel">दुकान का नाम:</label><input type="text" id="profileShopName"><label data-lang-key="shopAddressLabel">दुकान का पता:</label><textarea id="profileAddress" rows="3"></textarea><label data-lang-key="phoneNumLabel">फ़ोन नंबर:</label><input type="tel" id="profilePhone"><label data-lang-key="emailIdLabel">ईमेल आईडी:</label><input type="email" id="profileEmail" readonly></div><div><h4 data-lang-key="paymentAndLogo">भुगतान और लोगो</h4><label>UPI ID:</label><input type="text" id="profileUpiId" placeholder="yourname@bank" data-lang-key="upiPlaceholder"><label data-lang-key="shopLogoLabel">दुकान का लोगो:</label><input type="file" id="logoUpload" accept="image/jpeg,image/png"><img id="logoPreview" src="" style="max-width: 150px; max-height: 80px; border:1px solid #ccc; padding:5px; margin-top:10px;"></div></div><button id="saveProfileBtn" style="margin-top:20px;" data-lang-key="saveProfile">प्रोफ़ाइल सेव करें</button></div>
         <div id="backup-tab" class="tab-content">
             <h4 data-lang-key="backupRestoreTitle">बैकअप और रिस्टोर</h4>
@@ -167,9 +286,7 @@
     
     <!-- मोडल -->
     <div id="bill-modal" class="modal"><div class="modal-content"><div class="printable-area" id="bill-to-print-container"></div>
-        <!-- ===== यहाँ Adsterra विज्ञापन के लिए कंटेनर जोड़ें ====== -->
         <div id="ad-placeholder-in-modal" style="text-align:center; margin: 15px 0;"></div>
-        <!-- ========================================================== -->
     <div class="modal-buttons no-print" style="margin-top: 20px; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
         <button id="sendWhatsAppBtn" title="WhatsApp पर भेजें" style="background-color:#25D366; padding: 8px; line-height: 1; width:auto;">
             <svg fill="white" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.894 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.523.074-.797.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.203 5.076 4.487.709.306 1.262.489 1.694.626.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
@@ -180,6 +297,47 @@
     </div></div></div>
     <div id="history-modal" class="modal"><div class="modal-content" style="max-width:600px;"><h3 data-lang-key="purchaseHistoryOf">का खरीद इतिहास</h3><div id="historyContainer" style="max-height: 400px; overflow-y: auto;"></div><button id="closeHistoryModalBtn" style="margin-top:20px; background-color:#e74c3c;" data-lang-key="close">बंद करें</button></div></div>
     
+    <!-- आपूर्तिकर्ता खरीद मोडल -->
+    <div id="purchase-entry-modal" class="modal">
+        <div class="modal-content">
+            <h4 id="modalSupplierName" data-lang-key="purchaseEntryTitle">खरीद प्रविष्टियाँ</h4>
+            <div style="border-bottom: 1px solid var(--border-color); padding-bottom:15px; margin-bottom: 15px;">
+                <h5 data-lang-key="addProductToPurchase">खरीद में उत्पाद जोड़ें</h5>
+                <form id="addPurchaseItemForm">
+                    <div class="purchase-form-grid">
+                        <div>
+                            <label data-lang-key="productName" style="margin-bottom:2px;">उत्पाद का नाम</label>
+                            <input type="text" id="purchaseProductName" required style="margin-bottom:0;">
+                        </div>
+                        <div>
+                            <label data-lang-key="purchasePrice" style="margin-bottom:2px;">खरीद मूल्य (₹)</label>
+                            <input type="number" id="purchasePrice" required min="0.01" step="0.01" style="margin-bottom:0;">
+                        </div>
+                        <div>
+                            <label data-lang-key="quantity" style="margin-bottom:2px;">मात्रा</label>
+                            <input type="number" id="purchaseQuantity" required min="0.01" step="0.01" style="margin-bottom:0;">
+                        </div>
+                         <div>
+                            <label data-lang-key="unitLabel" style="margin-bottom:2px;">इकाई</label>
+                            <select id="purchaseUnit" style="margin-bottom:0;"><option>Pcs</option><option>Kg</option><option>Gm</option><option>Ltr</option><option>Mtr</option></select>
+                        </div>
+                        <div>
+                             <label style="visibility:hidden; margin-bottom:2px;">Action</label>
+                            <button type="submit" data-lang-key="addToPurchaseAndInventory" style="margin:0; width:100%;">खरीद में जोड़ें</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <h5 data-lang-key="purchaseHistoryTitle">खरीद इतिहास</h5>
+            <div id="purchaseHistoryContainer" style="max-height: 250px; overflow-y: auto;"></div>
+            <button id="closePurchaseModalBtn" style="margin-top:20px; background-color:#e74c3c;" data-lang-key="close">बंद करें</button>
+        </div>
+    </div>
+
+    <footer style="text-align: center; padding: 20px; font-family: 'Segoe UI', sans-serif; color: var(--text-color);">
+        Powered by Upendra K Chaudhary
+    </footer>
+
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     // --- अनुवाद ऑब्जेक्ट ---
@@ -188,12 +346,12 @@ document.addEventListener('DOMContentLoaded', () => {
             welcomeTitle: "Welcome Billing App", login: "लॉगिन करें", createAccount: "नया अकाउंट बनाएं", back: "← वापस",
             shopNameLabel: "दुकान का नाम:", emailLabel: "ईमेल:", mobileLabel: "मोबाइल:", passwordLabel: "पासवर्ड:",
             signUp: "साइन अप", emailOrMobileLabel: "ईमेल या मोबाइल:", logout: "लॉगआउट", billingTab: "बिलिंग",
-            inventoryTab: "इन्वेंटरी", customersTab: "ग्राहक", profileTab: "प्रोफ़ाइल", backupRestoreTab: "बैकअप/रिस्टोर",
-            customerDetails: "ग्राहक का विवरण", customerName: "ग्राहक का नाम:", customerPhone: "ग्राहक का फ़ोन:", customerAddress: "ग्राहक का पता:",
+            inventoryTab: "इन्वेंटरी", customersTab: "ग्राहक", suppliersTab: "आपूर्तिकर्ता", profileTab: "प्रोफ़ाइल", backupRestoreTab: "बैकअप/रिस्टोर",
+            analysisTab: "विश्लेषण", reportsTab: "रिपोर्ट्स", customerDetails: "ग्राहक का विवरण", customerName: "ग्राहक का नाम:", customerPhone: "ग्राहक का फ़ोन:", customerAddress: "ग्राहक का पता:",
             addItem: "आइटम जोड़ें", productSearch: "उत्पाद खोजें:", quantity: "मात्रा:", addToBill: "बिल में जोड़ें",
             currentBill: "वर्तमान बिल", productColumn: "उत्पाद", quantityColumn: "मात्रा", priceColumn: "मूल्य", totalColumn: "कुल",
-            subTotal: "उप-योग (Subtotal):", discount: "डिस्काउंट:", gst: "GST (%):", grandTotal: "कुल देय:",
-            generateBill: "बिल बनाएं", addProduct: "नया उत्पाद जोड़ें", productName: "उत्पाद का नाम:", priceLabel: "मूल्य (₹):",
+            rateColumn: "दर", subTotal: "उप-योग (Subtotal):", discount: "डिस्काउंट:", gst: "GST (%):", grandTotal: "कुल देय:",
+            generateBill: "बिल बनाएं", addProduct: "नया उत्पाद जोड़ें", productName: "उत्पाद का नाम:", priceLabel: "बिक्री मूल्य (₹):",
             unitLabel: "इकाई:", stockQuantity: "स्टॉक मात्रा:", addToStock: "स्टॉक में जोड़ें", currentStock: "वर्तमान स्टॉक",
             inStock: "स्टॉक में", printStock: "स्टॉक प्रिंट करें", saveAsPdf: "PDF के रूप में सहेजें", customerList: "ग्राहकों की सूची",
             nameColumn: "नाम", phoneColumn: "फ़ोन", actionColumn: "एक्शन", historyBtn: "इतिहास", shopDetails: "दुकान का विवरण",
@@ -214,18 +372,35 @@ document.addEventListener('DOMContentLoaded', () => {
             editBtn: "संपादित करें", deleteBtn: "हटाएं", updateBtn: "अपडेट करें", deleteConfirm: "क्या आप वाकई इस उत्पाद को हटाना चाहते हैं?",
             backupRestoreTitle: "बैकअप और रिस्टोर", backupInstructions: "अपने सभी डेटा (उत्पाद, ग्राहक, बिल आदि) को एक फ़ाइल के रूप में डाउनलोड करने के लिए 'बैकअप बनाएं' पर क्लिक करें। इस फ़ाइल को सुरक्षित रखें। डेटा वापस पाने के लिए 'बैकअप से रिस्टोर करें' का उपयोग करें।",
             createBackup: "बैकअप बनाएं", restoreBackup: "बैकअप से रिस्टोर करें", restoreConfirm: "क्या आप वाकई रिस्टोर करना चाहते हैं? यह सभी मौजूदा डेटा को ओवरराइट कर देगा।",
-            backupSuccess: "बैकअप फ़ाइल सफलतापूर्वक बन गई है।", restoreSuccess: "डेटा सफलतापूर्वक रिस्टोर हो गया है।", invalidBackupFile: "अमान्य बैकअप फ़ाइल।"
+            backupSuccess: "बैकअप फ़ाइल सफलतापूर्वक बन गई है।", restoreSuccess: "डेटा सफलतापूर्वक रिस्टोर हो गया है।", invalidBackupFile: "अमान्य बैकअप फ़ाइल।",
+            salesAnalysisTitle: "बिक्री विश्लेषण", totalRevenue: "कुल राजस्व", totalBillsGenerated: "कुल बिल", currentStockValue: "वर्तमान स्टॉक मूल्य",
+            topSellingProducts: "सबसे ज्यादा बिकने वाले उत्पाद", quantitySold: "बिकी हुई मात्रा",
+            downloadReportsTitle: "रिपोर्ट्स डाउनलोड करें", salesReportTitle: "बिक्री रिपोर्ट", stockReportTitle: "स्टॉक रिपोर्ट", customerListTitle: "ग्राहक सूची रिपोर्ट",
+            salesReportDesc: "एक तिथि सीमा के भीतर सभी बिलों की विस्तृत सूची डाउनलोड करें।", stockReportDesc: "वर्तमान में उपलब्ध सभी उत्पादों की सूची डाउनलोड करें।",
+            customerListDesc: "अपने सभी पंजीकृत ग्राहकों की सूची डाउनलोड करें।", fromDate: "से:", toDate: "तक:", downloadAsPdf: "PDF में डाउनलोड करें",
+            downloadAsCsv: "CSV में डाउनलोड करें", allBills: "सभी बिल", billDate: "बिल की तारीख", noDataFound: "चयनित सीमा के लिए कोई डेटा नहीं मिला।",
+            forgotPassword: "पासवर्ड भूल गए?", resetPasswordTitle: "पासवर्ड रीसेट करें", verifyEmail: "ईमेल सत्यापित करें",
+            enterRegisteredEmail: "अपना पंजीकृत ईमेल दर्ज करें।", enterRegisteredMobile: "पहचान सत्यापित करने के लिए अपना पंजीकृत मोबाइल नंबर दर्ज करें।",
+            newPassword: "नया पासवर्ड", confirmPassword: "पासवर्ड की पुष्टि करें", resetPasswordBtnText: "पासवर्ड रीसेट करें",
+            emailNotFound: "यह ईमेल पंजीकृत नहीं है।", verificationFailed: "मोबाइल नंबर मेल नहीं खाता।", passwordsDoNotMatch: "पासवर्ड मेल नहीं खाते।",
+            passwordResetSuccess: "पासवर्ड सफलतापूर्वक रीसेट हो गया! अब आप लॉगिन कर सकते हैं।",
+            addSupplier: "नया आपूर्तिकर्ता जोड़ें", supplierName: "आपूर्तिकर्ता का नाम:", supplierPhone: "आपूर्तिकर्ता का फ़ोन:",
+            supplierAddress: "आपूर्तिकर्ता का पता:", addSupplierBtn: "आपूर्तिकर्ता जोड़ें", supplierList: "आपूर्तिकर्ताओं की सूची",
+            viewPurchasesBtn: "खरीद देखें", confirmDeleteSupplier: "क्या आप वाकई इस आपूर्तिकर्ता को हटाना चाहते हैं? उनकी खरीद प्रविष्टियाँ बनी रहेंगी।",
+            purchaseEntryTitle: "खरीद प्रविष्टियाँ", addProductToPurchase: "खरीद में उत्पाद जोड़ें", purchasePrice: "खरीद मूल्य (₹)",
+            addToPurchaseAndInventory: "खरीद में जोड़ें", purchaseHistoryTitle: "खरीद इतिहास", purchaseDate: "खरीद की तारीख",
+            purchaseItems: "खरीदे गए आइटम", noPurchaseEntries: "इस आपूर्तिकर्ता के लिए कोई खरीद प्रविष्टि नहीं है।"
         },
         'en': {
             welcomeTitle: "Welcome Billing App", login: "Login", createAccount: "Create New Account", back: "← Back",
             shopNameLabel: "Shop Name:", emailLabel: "Email:", mobileLabel: "Mobile:", passwordLabel: "Password:",
             signUp: "Sign Up", emailOrMobileLabel: "Email or Mobile:", logout: "Logout", billingTab: "Billing",
-            inventoryTab: "Inventory", customersTab: "Customers", profileTab: "Profile", backupRestoreTab: "Backup/Restore",
-            customerDetails: "Customer Details", customerName: "Customer Name:", customerPhone: "Customer Phone:", customerAddress: "Customer Address:",
+            inventoryTab: "Inventory", customersTab: "Customers", suppliersTab: "Suppliers", profileTab: "Profile", backupRestoreTab: "Backup/Restore",
+            analysisTab: "Analysis", reportsTab: "Reports", customerDetails: "Customer Details", customerName: "Customer Name:", customerPhone: "Customer Phone:", customerAddress: "Customer Address:",
             addItem: "Add Item", productSearch: "Search Product:", quantity: "Quantity:", addToBill: "Add to Bill",
             currentBill: "Current Bill", productColumn: "Product", quantityColumn: "Quantity", priceColumn: "Price", totalColumn: "Total",
-            subTotal: "Subtotal:", discount: "Discount:", gst: "GST (%):", grandTotal: "Grand Total:",
-            generateBill: "Generate Bill", addProduct: "Add New Product", productName: "Product Name:", priceLabel: "Price (₹):",
+            rateColumn: "Rate", subTotal: "Subtotal:", discount: "Discount:", gst: "GST (%):", grandTotal: "Grand Total:",
+            generateBill: "Generate Bill", addProduct: "Add New Product", productName: "Product Name:", priceLabel: "Selling Price (₹):",
             unitLabel: "Unit:", stockQuantity: "Stock Quantity:", addToStock: "Add to Stock", currentStock: "Current Stock",
             inStock: "In Stock", printStock: "Print Stock", saveAsPdf: "Save as PDF", customerList: "Customer List",
             nameColumn: "Name", phoneColumn: "Phone", actionColumn: "Action", historyBtn: "History", shopDetails: "Shop Details",
@@ -246,18 +421,35 @@ document.addEventListener('DOMContentLoaded', () => {
             editBtn: "Edit", deleteBtn: "Delete", updateBtn: "Update", deleteConfirm: "Are you sure you want to delete this product?",
             backupRestoreTitle: "Backup & Restore", backupInstructions: "Click 'Create Backup' to download all your data (products, customers, bills, etc.) as a file. Keep this file safe. Use 'Restore from Backup' to recover your data.",
             createBackup: "Create Backup", restoreBackup: "Restore from Backup", restoreConfirm: "Are you sure you want to restore? This will overwrite all current data.",
-            backupSuccess: "Backup file created successfully.", restoreSuccess: "Data restored successfully.", invalidBackupFile: "Invalid backup file."
+            backupSuccess: "Backup file created successfully.", restoreSuccess: "Data restored successfully.", invalidBackupFile: "Invalid backup file.",
+            salesAnalysisTitle: "Sales Analysis", totalRevenue: "Total Revenue", totalBillsGenerated: "Total Bills", currentStockValue: "Current Stock Value",
+            topSellingProducts: "Top Selling Products", quantitySold: "Quantity Sold",
+            downloadReportsTitle: "Download Reports", salesReportTitle: "Sales Report", stockReportTitle: "Stock Report", customerListTitle: "Customer List Report",
+            salesReportDesc: "Download a detailed list of all bills within a date range.", stockReportDesc: "Download a list of all products currently in stock.",
+            customerListDesc: "Download a list of all your registered customers.", fromDate: "From:", toDate: "To:", downloadAsPdf: "Download as PDF",
+            downloadAsCsv: "Download as CSV", allBills: "All Bills", billDate: "Bill Date", noDataFound: "No data found for the selected range.",
+            forgotPassword: "Forgot Password?", resetPasswordTitle: "Reset Password", verifyEmail: "Verify Email",
+            enterRegisteredEmail: "Enter your registered email.", enterRegisteredMobile: "Enter your registered mobile number to verify your identity.",
+            newPassword: "New Password", confirmPassword: "Confirm Password", resetPasswordBtnText: "Reset Password",
+            emailNotFound: "This email is not registered.", verificationFailed: "Mobile number does not match.", passwordsDoNotMatch: "Passwords do not match.",
+            passwordResetSuccess: "Password reset successfully! You can now log in.",
+            addSupplier: "Add New Supplier", supplierName: "Supplier Name:", supplierPhone: "Supplier Phone:",
+            supplierAddress: "Supplier Address:", addSupplierBtn: "Add Supplier", supplierList: "Supplier List",
+            viewPurchasesBtn: "View Purchases", confirmDeleteSupplier: "Are you sure you want to delete this supplier? Their purchase entries will remain.",
+            purchaseEntryTitle: "Purchase Entries", addProductToPurchase: "Add Product to Purchase", purchasePrice: "Purchase Price (₹)",
+            addToPurchaseAndInventory: "Add to Purchase", purchaseHistoryTitle: "Purchase History", purchaseDate: "Purchase Date",
+            purchaseItems: "Purchased Items", noPurchaseEntries: "No purchase entries for this supplier."
         },
         'ur': {
             welcomeTitle: "Welcome Billing App", login: "لاگ ان کریں", createAccount: "نیا اکاؤنٹ بنائیں", back: "← واپس",
             shopNameLabel: "دکان کا نام:", emailLabel: "ای میل:", mobileLabel: "موبائل:", passwordLabel: "پاس ورڈ:",
             signUp: "سائن اپ", emailOrMobileLabel: "ای میل یا موبائل:", logout: "لاگ آوٹ", billingTab: "بلنگ",
-            inventoryTab: "انوینٹری", customersTab: "صارفین", profileTab: "پروفائل", backupRestoreTab: "بیک اپ/ریسٹور",
-            customerDetails: "صارف کی تفصیلات", customerName: "صارف کا نام:", customerPhone: "صارف کا فون:", customerAddress: "صارف کا پتہ:",
+            inventoryTab: "انوینٹری", customersTab: "صارفین", suppliersTab: "سپلائرز", profileTab: "پروفائل", backupRestoreTab: "بیک اپ/ریسٹور",
+            analysisTab: "تجزیہ", reportsTab: "رپورٹس", customerDetails: "صارف کی تفصیلات", customerName: "صارف کا نام:", customerPhone: "صارف کا فون:", customerAddress: "صارف کا پتہ:",
             addItem: "آئٹم شامل کریں", productSearch: "پروڈکٹ تلاش کریں:", quantity: "مقدار:", addToBill: "بل میں شامل کریں",
             currentBill: "موجودہ بل", productColumn: "پروڈکٹ", quantityColumn: "مقدار", priceColumn: "قیمت", totalColumn: "کل",
-            subTotal: "ذیلی کل:", discount: "رعایت:", gst: "جی ایس ٹی (%):", grandTotal: "کل قابل ادائیگی:",
-            generateBill: "بل بنائیں", addProduct: "نیا پروڈکٹ شامل کریں", productName: "پروڈکٹ کا نام:", priceLabel: "قیمت (₹):",
+            rateColumn: "شرح", subTotal: "ذیلی کل:", discount: "رعایت:", gst: "جی ایس ٹی (%):", grandTotal: "کل قابل ادائیگی:",
+            generateBill: "بل بنائیں", addProduct: "نیا پروڈکٹ شامل کریں", productName: "پروڈکٹ کا نام:", priceLabel: "فروخت کی قیمت (₹):",
             unitLabel: "یونٹ:", stockQuantity: "اسٹاک کی مقدار:", addToStock: "اسٹاک میں شامل کریں", currentStock: "موجودہ اسٹاک",
             inStock: "اسٹاک میں", printStock: "اسٹاک پرنٹ کریں", saveAsPdf: "پی ڈی ایف کے طور پر محفوظ کریں", customerList: "صارفین کی فہرست",
             nameColumn: "نام", phoneColumn: "فون", actionColumn: "عمل", historyBtn: "تاریخ", shopDetails: "دکان کی تفصیلات",
@@ -278,12 +470,29 @@ document.addEventListener('DOMContentLoaded', () => {
             editBtn: "ترمیم", deleteBtn: "حذف کریں", updateBtn: "اپ ڈیٹ", deleteConfirm: "کیا آپ واقعی اس پروڈکٹ کو حذف کرنا چاہتے ہیں؟",
             backupRestoreTitle: "بیک اپ اور ریسٹور", backupInstructions: "اپنے تمام ڈیٹا (مصنوعات، صارفین، بل، وغیرہ) کو فائل کے طور پر ڈاؤن لوڈ کرنے کے لیے 'بیک اپ بنائیں' پر کلک کریں۔ اس فائل کو محفوظ رکھیں۔ اپنا ڈیٹا بازیافت کرنے کے لیے 'بیک اپ سے بحال کریں' کا استعمال کریں۔",
             createBackup: "بیک اپ بنائیں", restoreBackup: "بیک اپ سے بحال کریں", restoreConfirm: "کیا آپ واقعی بحال کرنا چاہتے ہیں؟ یہ تمام موجودہ ڈیٹا کو اوور رائٹ کر دے گا۔",
-            backupSuccess: "بیک اپ فائل کامیابی سے بن گئی۔", restoreSuccess: "ڈیٹا کامیابی سے بحال ہو گیا۔", invalidBackupFile: "غلط بیک اپ فائل۔"
+            backupSuccess: "بیک اپ فائل کامیابی سے بن گئی۔", restoreSuccess: "ڈیٹا کامیابی سے بحال ہو گیا۔", invalidBackupFile: "غلط بیک اپ فائل۔",
+            salesAnalysisTitle: "فروخت کا تجزیہ", totalRevenue: "کل آمدنی", totalBillsGenerated: "کل بل", currentStockValue: "موجودہ اسٹاک کی قیمت",
+            topSellingProducts: "سب سے زیادہ فروخت ہونے والی مصنوعات", quantitySold: "فروخت شدہ مقدار",
+            downloadReportsTitle: "رپورٹس ڈاؤن لوڈ کریں", salesReportTitle: "سیلز رپورٹ", stockReportTitle: "اسٹاک رپورٹ", customerListTitle: "کسٹمر لسٹ رپورٹ",
+            salesReportDesc: "تاریخ کی حد کے اندر تمام بلوں کی تفصیلی فہرست ڈاؤن لوڈ کریں۔", stockReportDesc: "اسٹاک میں موجود تمام مصنوعات کی فہرست ڈاؤن لوڈ کریں۔",
+            customerListDesc: "اپنے تمام رجسٹرڈ صارفین کی فہرست ڈاؤن لوڈ کریں۔", fromDate: "سے:", toDate: "تک:", downloadAsPdf: "پی ڈی ایف میں ڈاؤن لوڈ کریں",
+            downloadAsCsv: "سی ایس وی میں ڈاؤن لوڈ کریں", allBills: "تمام بل", billDate: "بل کی تاریخ", noDataFound: "منتخب کردہ حد کے لیے کوئی ڈیٹا نہیں ملا۔",
+            forgotPassword: "پاس ورڈ بھول گئے؟", resetPasswordTitle: "پاس ورڈ ری سیٹ کریں", verifyEmail: "ای میل کی توثیق کریں",
+            enterRegisteredEmail: "اپنا رجسٹرڈ ای میل درج کریں۔", enterRegisteredMobile: "شناخت کی توثیق کے لیے اپنا رجسٹرڈ موبائل نمبر درج کریں۔",
+            newPassword: "نیا پاس ورڈ", confirmPassword: "پاس ورڈ کی تصدیق کریں", resetPasswordBtnText: "پاس ورڈ ری سیٹ کریں",
+            emailNotFound: "یہ ای میل رجسٹرڈ نہیں ہے۔", verificationFailed: "موبائل نمبر مماثل نہیں ہے۔", passwordsDoNotMatch: "پاس ورڈز مماثل نہیں ہیں۔",
+            passwordResetSuccess: "پاس ورڈ کامیابی سے دوبارہ ترتیب دیا گیا! اب آپ لاگ ان کر سکتے ہیں۔",
+            addSupplier: "نیا سپلائر شامل کریں", supplierName: "سپلائر کا نام:", supplierPhone: "سپلائر کا فون:",
+            supplierAddress: "سپلائر کا پتہ:", addSupplierBtn: "سپلائر شامل کریں", supplierList: "سپلائرز کی فہرست",
+            viewPurchasesBtn: "خریداری دیکھیں", confirmDeleteSupplier: "کیا آپ واقعی اس سپلائر کو حذف کرنا چاہتے ہیں؟ ان کی خریداری کے اندراجات باقی رہیں گے۔",
+            purchaseEntryTitle: "خریداری کے اندراجات", addProductToPurchase: "خریداری میں پروڈکٹ شامل کریں", purchasePrice: "خریداری کی قیمت (₹)",
+            addToPurchaseAndInventory: "خریداری میں شامل کریں", purchaseHistoryTitle: "خریداری کی تاریخ", purchaseDate: "خریداری کی تاریخ",
+            purchaseItems: "خریدے گئے آئٹمز", noPurchaseEntries: "اس سپلائر کے لیے کوئی خریداری اندراج نہیں ہے۔"
         }
     };
     
     // --- ग्लोबल वेरिएबल्स ---
-    let allRetailerData = {}, currentUserEmail = null, currentBillItems = [], billCounter = 1, selectedProductForBill = null, currentLanguage = 'hi', editingProductId = null, currentBillForModal = null;
+    let allRetailerData = {}, currentUserEmail = null, currentBillItems = [], billCounter = 1, selectedProductForBill = null, currentLanguage = 'hi', editingProductId = null, currentBillForModal = null, editingSupplierId = null, currentViewingSupplierId = null;
     const app = {}; window.app = app;
     
     // --- भाषा फंक्शन ---
@@ -297,43 +506,68 @@ document.addEventListener('DOMContentLoaded', () => {
             const key = el.dataset.langKey;
             const translation = translations[lang][key];
             if (translation) {
-                if (el.placeholder) {
-                    el.placeholder = translation;
-                } else {
-                    el.innerText = translation;
-                }
+                if (el.placeholder) { el.placeholder = translation; } 
+                else { el.innerText = translation; }
             }
         });
         document.getElementById('language-select').value = lang;
         const whatsappBtn = document.getElementById('sendWhatsAppBtn');
-        if (whatsappBtn) {
-            whatsappBtn.title = translations[lang].sendOnWhatsApp;
-        }
-        // UI के डायनामिक हिस्सों को फिर से रेंडर करें
-        if (currentUserEmail) {
-            renderAllUI();
-        }
+        if (whatsappBtn) { whatsappBtn.title = translations[lang].sendOnWhatsApp; }
+        if (currentUserEmail) { renderAllUI(); }
     };
 
     // --- हेल्पर और UI फंक्शन ---
     const saveData = () => { localStorage.setItem('allRetailerData', JSON.stringify(allRetailerData)); };
     const loadData = () => { allRetailerData = JSON.parse(localStorage.getItem('allRetailerData')) || {}; billCounter = parseInt(localStorage.getItem('billCounter')) || 1; };
-    const showPage = (pageName) => { document.querySelectorAll('.container').forEach(p => p.classList.add('hidden')); document.getElementById(pageName).classList.remove('hidden'); };
+    const showPage = (pageName) => { 
+        document.querySelectorAll('.container').forEach(p => p.classList.add('hidden')); 
+        document.getElementById(pageName).classList.remove('hidden');
+        if (pageName === 'reset-password-page') {
+             document.getElementById('resetPasswordForm').reset();
+             document.getElementById('newPasswordSection').classList.add('hidden');
+             document.getElementById('resetEmail').disabled = false;
+             document.getElementById('verifyEmailBtn').disabled = false;
+        }
+    };
     const showTab = (tabName) => {
         document.querySelectorAll('.tab-content, .tab-link').forEach(el => el.classList.remove('active'));
         document.getElementById(`${tabName}-tab`).classList.add('active');
         document.querySelector(`.tab-link[data-tab='${tabName}']`).classList.add('active');
+        if (tabName === 'reports') {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('salesReportToDate').value = today;
+        }
     };
     
+    const renderAnalysisTab = () => {
+        const retailer = allRetailerData[currentUserEmail];
+        if (!retailer) return;
+        const bills = retailer.bills || [];
+        const inventory = retailer.inventory || [];
+        const totalRevenue = bills.reduce((sum, bill) => sum + bill.total, 0);
+        const totalBills = bills.length;
+        const stockValue = inventory.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        const salesData = {};
+        bills.forEach(bill => { bill.items.forEach(item => { salesData[item.name] = (salesData[item.name] || 0) + item.quantity; }); });
+        const sortedProducts = Object.entries(salesData).sort((a, b) => b[1] - a[1]);
+        document.getElementById('totalRevenueDisplay').innerText = `₹${totalRevenue.toFixed(2)}`;
+        document.getElementById('totalBillsDisplay').innerText = totalBills;
+        document.getElementById('stockValueDisplay').innerText = `₹${stockValue.toFixed(2)}`;
+        const topSellingTableBody = document.getElementById('topSellingTableBody');
+        topSellingTableBody.innerHTML = sortedProducts.slice(0, 10).map(([name, quantity]) => `<tr><td>${name}</td><td>${quantity.toFixed(2)}</td></tr>`).join('');
+    };
+
     const renderAllUI = () => {
         if (!currentUserEmail || !allRetailerData[currentUserEmail]) return;
         const retailer = allRetailerData[currentUserEmail];
         document.getElementById('retailerShopName').innerText = retailer.shopDetails.name;
         renderInventoryTable();
+        renderSupplierTable();
         renderProfile();
         renderCustomerTable();
         populateBillingDropdown();
         updateCurrentBillDisplay();
+        renderAnalysisTab();
     };
     const renderInventoryTable = () => {
         const inventory = allRetailerData[currentUserEmail]?.inventory || [];
@@ -349,6 +583,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 </td>
             </tr>`).join('');
     };
+
+    const renderSupplierTable = () => {
+        const suppliers = allRetailerData[currentUserEmail]?.suppliers || [];
+        const lang = translations[currentLanguage];
+        document.getElementById('supplierTableBody').innerHTML = suppliers.map(s => `
+            <tr>
+                <td>${s.name}</td>
+                <td>${s.phone}</td>
+                <td>
+                    <button class="action-button view" onclick="window.app.openPurchaseModal(${s.id})">${lang.viewPurchasesBtn}</button>
+                    <button class="action-button edit" onclick="window.app.editSupplier(${s.id})">${lang.editBtn}</button>
+                    <button class="action-button delete" onclick="window.app.deleteSupplier(${s.id})">${lang.deleteBtn}</button>
+                </td>
+            </tr>`).join('');
+    };
+
     const renderProfile = () => {
         const details = allRetailerData[currentUserEmail].shopDetails;
         document.getElementById('profileShopName').value = details.name; document.getElementById('profileAddress').value = details.address || '';
@@ -367,7 +617,7 @@ document.addEventListener('DOMContentLoaded', () => {
         calculateFinalTotal();
     };
     const calculateFinalTotal = () => {
-        let subTotal = 0; currentBillItems.forEach(item => subTotal += item.total);
+        let subTotal = currentBillItems.reduce((sum, item) => sum + item.total, 0);
         const discountValue = parseFloat(document.getElementById('discountInput').value) || 0;
         const discountType = document.getElementById('discountType').value;
         const gstPercent = parseFloat(document.getElementById('gstInput').value) || 0;
@@ -409,6 +659,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
     
+    const downloadCsv = (filename, headers, data) => {
+        const csvRows = [headers.join(','), ...data.map(row => row.map(val => `"${String(val ?? '').replace(/"/g, '""')}"`).join(','))];
+        const blob = new Blob(['\uFEFF' + csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.download = filename;
+        link.href = url;
+        link.click();
+        URL.revokeObjectURL(url);
+    };
+
     // --- इवेंट हैंडलर्स ---
     const handleLogin = (e) => {
         e.preventDefault();
@@ -425,7 +686,7 @@ document.addEventListener('DOMContentLoaded', () => {
         allRetailerData[email] = {
             password: document.getElementById('signupPassword').value,
             shopDetails: { name: document.getElementById('signupShopName').value, phone: document.getElementById('signupPhone').value, address: '', logo: '', upiId: '' },
-            inventory: [], customers: [], bills: []
+            inventory: [], customers: [], bills: [], suppliers: [], purchaseEntries: []
         };
         saveData(); alert(translations[currentLanguage].signupSuccess); e.target.reset(); showPage('login-page');
     };
@@ -438,38 +699,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const quantity = parseFloat(document.getElementById('productQuantity').value);
         const unit = document.getElementById('productUnit').value;
         const lang = translations[currentLanguage];
-
-        if (!name || isNaN(price) || price < 0 || isNaN(quantity) || quantity < 0) {
-            alert(lang.fillAllFields);
-            return;
-        }
-
+        if (!name || isNaN(price) || price < 0 || isNaN(quantity) || quantity < 0) { alert(lang.fillAllFields); return; }
         if (editingProductId) {
             const productToUpdate = retailerData.inventory.find(p => p.id === editingProductId);
-            if (productToUpdate) {
-                productToUpdate.name = name;
-                productToUpdate.price = price;
-                productToUpdate.quantity = quantity;
-                productToUpdate.unit = unit;
-                alert(lang.productUpdatedSuccess);
-            }
+            if (productToUpdate) { Object.assign(productToUpdate, { name, price, quantity, unit }); alert(lang.productUpdatedSuccess); }
             editingProductId = null;
             document.getElementById('stockSubmitBtn').innerText = lang.addToStock;
         } else {
             const existingProduct = retailerData.inventory.find(item => item.name.toLowerCase() === name.toLowerCase());
-            if (existingProduct) {
-                existingProduct.quantity += quantity;
-                alert(lang.quantityUpdatedSuccess);
-            } else {
-                if (!Array.isArray(retailerData.inventory)) retailerData.inventory = [];
-                retailerData.inventory.push({ id: Date.now(), name, price, quantity, unit });
-                alert(lang.productAddedSuccess);
-            }
+            if (existingProduct) { existingProduct.quantity += quantity; alert(lang.quantityUpdatedSuccess); } 
+            else { retailerData.inventory.push({ id: Date.now(), name, price, quantity, unit }); alert(lang.productAddedSuccess); }
         }
-        
-        saveData();
-        renderInventoryTable();
-        e.target.reset();
+        saveData(); renderInventoryTable(); e.target.reset();
     };
 
     const handleAddItemToBill = (e) => {
@@ -478,12 +719,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const quantity = parseFloat(document.getElementById('itemQuantity').value);
         if (quantity > selectedProductForBill.quantity) { alert(translations[currentLanguage].stockUnavailable.replace('{quantity}', selectedProductForBill.quantity).replace('{unit}', selectedProductForBill.unit)); return; }
         const existingItem = currentBillItems.find(item => item.id === selectedProductForBill.id);
-        if (existingItem) {
-            existingItem.quantity += quantity;
-            existingItem.total = existingItem.quantity * existingItem.price;
-        } else {
-            currentBillItems.push({ ...selectedProductForBill, quantity, total: selectedProductForBill.price * quantity });
-        }
+        if (existingItem) { existingItem.quantity += quantity; existingItem.total = existingItem.quantity * existingItem.price; } 
+        else { currentBillItems.push({ ...selectedProductForBill, quantity, total: selectedProductForBill.price * quantity }); }
         updateCurrentBillDisplay();
         document.getElementById('productSearchInput').value = '';
         selectedProductForBill = null;
@@ -504,15 +741,10 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     
     app.deleteProduct = (productId) => {
-        const lang = translations[currentLanguage];
-        if (confirm(lang.deleteConfirm)) {
+        if (confirm(translations[currentLanguage].deleteConfirm)) {
             const retailerData = allRetailerData[currentUserEmail];
             const productIndex = retailerData.inventory.findIndex(p => p.id === productId);
-            if (productIndex > -1) {
-                retailerData.inventory.splice(productIndex, 1);
-                saveData();
-                renderInventoryTable();
-            }
+            if (productIndex > -1) { retailerData.inventory.splice(productIndex, 1); saveData(); renderInventoryTable(); }
         }
     };
     
@@ -531,93 +763,43 @@ document.addEventListener('DOMContentLoaded', () => {
         const shopName = allRetailerData[currentUserEmail].shopDetails.name;
         doc.text(`${translations[currentLanguage].stockReport} - ${shopName}`, 14, 15);
         const tableData = (allRetailerData[currentUserEmail].inventory || []).map(p => [p.name, `Rs. ${p.price.toFixed(2)}`, `${p.quantity} ${p.unit}`]);
-        doc.autoTable({
-            head: [[translations[currentLanguage].productColumn, translations[currentLanguage].priceColumn, translations[currentLanguage].inStock]],
-            body: tableData,
-            startY: 20,
-        });
+        doc.autoTable({ head: [[translations[currentLanguage].productColumn, translations[currentLanguage].priceColumn, translations[currentLanguage].inStock]], body: tableData, startY: 20 });
         doc.save(`${translations[currentLanguage].stockReport}-${Date.now()}.pdf`);
     };
     
     const handleSaveProfile = () => {
         const details = allRetailerData[currentUserEmail].shopDetails;
-        details.name = document.getElementById('profileShopName').value;
-        details.address = document.getElementById('profileAddress').value;
-        details.phone = document.getElementById('profilePhone').value;
-        details.upiId = document.getElementById('profileUpiId').value.trim();
+        Object.assign(details, { name: document.getElementById('profileShopName').value, address: document.getElementById('profileAddress').value, phone: document.getElementById('profilePhone').value, upiId: document.getElementById('profileUpiId').value.trim() });
         const logoFile = document.getElementById('logoUpload').files[0];
-        
         const imageToBs64 = (file, callback) => {
-            if (file) {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => callback(reader.result);
-                reader.onerror = () => callback(null);
-            } else {
-                callback(null);
-            }
+            if (file) { const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = () => callback(reader.result); reader.onerror = () => callback(null); } 
+            else { callback(null); }
         };
-
-        imageToBs64(logoFile, (bs64) => { 
-            if(bs64) details.logo = bs64;
-            saveData(); 
-            alert(translations[currentLanguage].profileSaved); 
-            renderAllUI();
-        });
+        imageToBs64(logoFile, (bs64) => { if(bs64) details.logo = bs64; saveData(); alert(translations[currentLanguage].profileSaved); renderAllUI(); });
     };
     
-    // +++ विज्ञापन लोड करने का फंक्शन यहाँ जोड़ा गया है +++
     const loadNativeAdAfterBill = () => {
-        // 1. विज्ञापन दिखाने के लिए बनाया गया कंटेनर खोजें
-        const adPlaceholder = document.getElementById('ad-placeholder-in-modal');
-        if (!adPlaceholder) return; // अगर कंटेनर नहीं है तो कुछ न करें
-
-        // 2. हर बार नया विज्ञापन दिखाने के लिए कंटेनर को साफ़ करें
-        adPlaceholder.innerHTML = '';
-
-        // 3. Adsterra के लिए आवश्यक div बनाएं (आपके कोड के अनुसार)
-        const adContainer = document.createElement('div');
-        adContainer.id = 'container-4602f664803407cfda1aae472a65c04e';
-        adPlaceholder.appendChild(adContainer);
-
-        // 4. पुराने विज्ञापन स्क्रिप्ट को हटाएं ताकि कोई टकराव न हो
-        const oldScript = document.querySelector('script[src*="pl27251273.profitableratecpm.com"]');
-        if (oldScript) {
-            oldScript.remove();
-        }
-
-        // 5. Adsterra की विज्ञापन स्क्रिप्ट बनाएं और पेज में जोड़ें
+        const adPlaceholder = document.getElementById('ad-placeholder-in-modal'); if (!adPlaceholder) return; 
+        adPlaceholder.innerHTML = `<div id="container-4602f664803407cfda1aae472a65c04e"></div>`;
+        const oldScript = document.querySelector('script[src*="pl27251273.profitableratecpm.com"]'); if (oldScript) oldScript.remove();
         const adScript = document.createElement('script');
-        adScript.async = true;
-        adScript.dataset.cfasync = false;
-        adScript.src = '//pl27251273.profitableratecpm.com/4602f664803407cfda1aae472a65c04e/invoke.js';
-        
-        document.head.appendChild(adScript); // स्क्रिप्ट को हेड में जोड़ना सबसे अच्छा है
+        Object.assign(adScript, { async: true, 'data-cfasync': false, src: '//pl27251273.profitableratecpm.com/4602f664803407cfda1aae472a65c04e/invoke.js' });
+        document.head.appendChild(adScript);
     };
-
 
     app.generateBillHTML = (bill, retailer, customer) => {
         const lang = translations[currentLanguage];
-        const billTextColor = '#000';
-        const billBgColor = '#fff';
         const gstValue = bill.subTotal - bill.discountAmount > 0 ? (100 * bill.gstAmount / (bill.subTotal - bill.discountAmount)).toFixed(2) : 0;
-        
-        return `<div id="bill-to-print" style="background-color: ${billBgColor}; color: ${billTextColor}; padding: 15px; direction: ${document.documentElement.dir};">
-            <div style="text-align:center; font-family:'Courier New';"><img src="${retailer.shopDetails.logo || ''}" style="max-height:80px;"><h3 style="margin:5px 0;">${retailer.shopDetails.name}</h3><p style="margin:2px 0;">${retailer.shopDetails.address}</p><p style="margin:2px 0;">${lang.phoneColumn}: ${retailer.shopDetails.phone}</p><p style="margin:2px 0;">${lang.billNo} ${bill.billNo}</p><p style="margin:2px 0;">${lang.date}: ${bill.date} | ${bill.time}</p></div><hr style="border:1px dashed #333;"><div class="bill-customer-info" style="font-family:'Courier New';"><h4 style="margin:0; text-align:${document.documentElement.dir === 'rtl' ? 'right' : 'left'};">${lang.customer}:</h4><p><strong>${lang.name}:</strong> ${customer.name}</p><p><strong>${lang.mobile}:</strong> ${customer.phone}</p></div><hr style="border:1px dashed #333;"><table style="width:100%; font-size:14px; border-collapse:collapse; font-family:'Courier New';"><thead><tr><th>${lang.productColumn}</th><th>${lang.quantityColumn}</th><th>${lang.totalColumn}</th></tr></thead><tbody>${bill.items.map(item => `<tr><td>${item.name}</td><td>${item.quantity} ${item.unit}</td><td>₹${item.total.toFixed(2)}</td></tr>`).join('')}</tbody></table><hr style="border:1px dashed #333;"><div style="font-family:'Segoe UI';"><div class="bill-summary-row"><span>${lang.subTotalBill}</span><span>₹${bill.subTotal.toFixed(2)}</span></div><div class="bill-summary-row"><span>${lang.discountBill}</span><span>- ₹${bill.discountAmount.toFixed(2)}</span></div><div class="bill-summary-row"><span>GST (${gstValue}%):</span><span>+ ₹${bill.gstAmount.toFixed(2)}</span></div><div class="bill-summary-row grand-total" style="border-top-color: #333;"><span>${lang.grandTotalBill}</span><span>₹${bill.total.toFixed(2)}</span></div></div><p style="text-align:center;font-weight:bold;">${lang.scanToPay}</p><img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(`upi://pay?pa=${retailer.shopDetails.upiId}&pn=${encodeURIComponent(retailer.shopDetails.name)}&am=${bill.total.toFixed(2)}&cu=INR&tn=BillNo${bill.billNo}`)}" alt="UPI QR Code" style="display:block;margin:15px auto;width:160px;height:160px;"><div style="text-align:center;margin-top:20px;"><p>${lang.visitAgain} ${lang.thanksForShopping}</p></div>
+        return `<div id="bill-to-print" style="background-color: #fff; color: #000; padding: 15px; direction: ${document.documentElement.dir};">
+            <div style="text-align:center; font-family:'Courier New';"><img src="${retailer.shopDetails.logo || ''}" style="max-height:80px;"><h3 style="margin:5px 0;">${retailer.shopDetails.name}</h3><p style="margin:2px 0;">${retailer.shopDetails.address}</p><p style="margin:2px 0;">${lang.phoneColumn}: ${retailer.shopDetails.phone}</p><p style="margin:2px 0;">${lang.billNo} ${bill.billNo}</p><p style="margin:2px 0;">${lang.date}: ${bill.date} | ${bill.time}</p></div><hr style="border:1px dashed #333;"><div class="bill-customer-info" style="font-family:'Courier New';"><h4 style="margin:0; text-align:${document.documentElement.dir === 'rtl' ? 'right' : 'left'};">${lang.customer}:</h4><p><strong>${lang.name}:</strong> ${customer.name}</p><p><strong>${lang.mobile}:</strong> ${customer.phone}</p></div><hr style="border:1px dashed #333;"><table style="width:100%; font-size:14px; border-collapse:collapse; font-family:'Courier New';"><thead><tr><th style="text-align:left;">${lang.productColumn}</th><th style="text-align:center;">${lang.quantityColumn}</th><th style="text-align:right;">${lang.rateColumn}</th><th style="text-align:right;">${lang.totalColumn}</th></tr></thead><tbody>${bill.items.map(item => `<tr><td style="text-align:left;">${item.name}</td><td style="text-align:center;">${item.quantity} ${item.unit}</td><td style="text-align:right;">₹${item.price.toFixed(2)}</td><td style="text-align:right;">₹${item.total.toFixed(2)}</td></tr>`).join('')}</tbody></table><hr style="border:1px dashed #333;"><div style="font-family:'Segoe UI';"><div class="bill-summary-row"><span>${lang.subTotalBill}</span><span>₹${bill.subTotal.toFixed(2)}</span></div><div class="bill-summary-row"><span>${lang.discountBill}</span><span>- ₹${bill.discountAmount.toFixed(2)}</span></div><div class="bill-summary-row"><span>GST (${gstValue}%):</span><span>+ ₹${bill.gstAmount.toFixed(2)}</span></div><div class="bill-summary-row grand-total" style="border-top-color: #333;"><span>${lang.grandTotalBill}</span><span>₹${bill.total.toFixed(2)}</span></div></div><p style="text-align:center;font-weight:bold;">${lang.scanToPay}</p><img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(`upi://pay?pa=${retailer.shopDetails.upiId}&pn=${encodeURIComponent(retailer.shopDetails.name)}&am=${bill.total.toFixed(2)}&cu=INR&tn=BillNo${bill.billNo}`)}" alt="UPI QR Code" style="display:block;margin:15px auto;width:160px;height:160px;"><div style="text-align:center;margin-top:20px;"><p>${lang.visitAgain} ${lang.thanksForShopping}</p></div>
         </div>`;
     };
 
     const getOrCreateCustomer = (name, phone, address) => {
         const retailer = allRetailerData[currentUserEmail];
-        if (!Array.isArray(retailer.customers)) { retailer.customers = []; }
         let customer = retailer.customers.find(c => c.phone === phone);
-        if (customer) { 
-            customer.name = name; 
-            customer.address = address;
-        } else { 
-            customer = { id: Date.now(), name, phone, address }; 
-            retailer.customers.push(customer); 
-        }
+        if (customer) { Object.assign(customer, { name, address }); } 
+        else { customer = { id: Date.now(), name, phone, address }; retailer.customers.push(customer); }
         return customer;
     };
     
@@ -626,14 +808,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const retailer = allRetailerData[currentUserEmail];
         const customerName = document.getElementById('billingCustomerName').value.trim();
         const customerPhone = document.getElementById('billingCustomerPhone').value.trim();
-        const customerAddress = document.getElementById('billingCustomerAddress').value.trim();
-
         if (!customerPhone || !customerName) { alert(translations[currentLanguage].customerInfoRequired); return; }
-        
-        const customerForBill = getOrCreateCustomer(customerName, customerPhone, customerAddress);
+        const customerForBill = getOrCreateCustomer(customerName, customerPhone, document.getElementById('billingCustomerAddress').value.trim());
         renderCustomerTable(); 
-
-        let subTotal = 0; currentBillItems.forEach(item => subTotal += item.total);
+        let subTotal = currentBillItems.reduce((sum, item) => sum + item.total, 0);
         const discountValue = parseFloat(document.getElementById('discountInput').value) || 0;
         const discountType = document.getElementById('discountType').value;
         const gstPercent = parseFloat(document.getElementById('gstInput').value) || 0;
@@ -641,28 +819,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const totalAfterDiscount = subTotal - discountAmount;
         const gstAmount = (totalAfterDiscount * gstPercent) / 100;
         const finalTotal = totalAfterDiscount + gstAmount;
-
         const today = new Date();
         const billDate = `${String(today.getDate()).padStart(2, '0')}-${String(today.getMonth() + 1).padStart(2, '0')}-${today.getFullYear()}`;
         const billTime = `${String(today.getHours()).padStart(2, '0')}:${String(today.getMinutes()).padStart(2, '0')}:${String(today.getSeconds()).padStart(2, '0')}`;
-        
-        if (!Array.isArray(retailer.bills)) retailer.bills = [];
         const newBill = { billNo: billCounter, customerId: customerForBill.id, date: billDate, time: billTime, items: JSON.parse(JSON.stringify(currentBillItems)), subTotal, discountAmount, gstAmount, total: finalTotal };
         retailer.bills.push(newBill);
-        
-        currentBillForModal = newBill; // वर्तमान बिल को शेयरिंग के लिए सेट करें
-
+        currentBillForModal = newBill;
         currentBillItems.forEach(item => { retailer.inventory.find(p => p.id === item.id).quantity -= item.quantity; });
-        
-        const billModalContent = document.getElementById('bill-to-print-container');
-        billModalContent.innerHTML = app.generateBillHTML(newBill, retailer, customerForBill);
-        
+        document.getElementById('bill-to-print-container').innerHTML = app.generateBillHTML(newBill, retailer, customerForBill);
         saveData();
-        renderInventoryTable();
-
-        // +++ विज्ञापन लोड करने का फंक्शन यहाँ कॉल किया गया है +++
+        renderAllUI(); 
         loadNativeAdAfterBill();
-
         document.getElementById('bill-modal').style.display = 'block';
     };
 
@@ -670,26 +837,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const retailer = allRetailerData[currentUserEmail];
         const customer = retailer.customers.find(c => c.id == customerId);
         const customerBills = retailer.bills.filter(b => b.customerId == customerId).reverse();
-        
-        const historyTitle = document.querySelector('#history-modal h3');
-        historyTitle.innerHTML = `<span id="historyCustomerName">${customer.name}</span> ${translations[currentLanguage].purchaseHistoryOf}`;
-
+        document.querySelector('#history-modal h3').innerHTML = `<span id="historyCustomerName">${customer.name}</span> ${translations[currentLanguage].purchaseHistoryOf}`;
         const container = document.getElementById('historyContainer');
         const lang = translations[currentLanguage];
-        
-        if (customerBills.length === 0) {
-            container.innerHTML = `<p>${lang.noPurchaseHistory}</p>`;
-        } else {
-            container.innerHTML = customerBills.map(bill => `
-                <div class="history-item">
-                    <p><strong>${lang.billNo}</strong> ${bill.billNo} | <strong>${lang.date}:</strong> ${bill.date} | <strong>${lang.total}:</strong> ₹${bill.total.toFixed(2)}</p>
-                    <div class="history-item-actions">
-                         <button onclick="app.reprintBill(${bill.billNo})" style="background-color:#27ae60;">${lang.viewBill}</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-        
+        if (customerBills.length === 0) container.innerHTML = `<p>${lang.noPurchaseHistory}</p>`;
+        else container.innerHTML = customerBills.map(bill => `<div class="history-item"><p><strong>${lang.billNo}</strong> ${bill.billNo} | <strong>${lang.date}:</strong> ${bill.date} | <strong>${lang.total}:</strong> ₹${bill.total.toFixed(2)}</p><div class="history-item-actions"><button onclick="app.reprintBill(${bill.billNo})" style="background-color:#27ae60;">${lang.viewBill}</button></div></div>`).join('');
         document.getElementById('history-modal').style.display = 'block';
     };
     
@@ -697,50 +849,34 @@ document.addEventListener('DOMContentLoaded', () => {
         const retailer = allRetailerData[currentUserEmail];
         const bill = retailer.bills.find(b => b.billNo == billNo);
         const customer = retailer.customers.find(c => c.id == bill.customerId);
-
         if (bill && customer) {
-            currentBillForModal = bill; // रीप्रिंट बिल को शेयरिंग के लिए सेट करें
+            currentBillForModal = bill;
             document.getElementById('bill-to-print-container').innerHTML = app.generateBillHTML(bill, retailer, customer);
             document.getElementById('history-modal').style.display = 'none';
-            
-            // +++ विज्ञापन लोड करने का फंक्शन यहाँ भी कॉल किया गया है +++
             loadNativeAdAfterBill();
-            
             document.getElementById('bill-modal').style.display = 'block';
             document.getElementById('closeBillModalBtn').dataset.isReprint = "true";
         }
     };
 
-    // --- बैकअप और रिस्टोर फंक्शन ---
     const handleCreateBackup = () => {
-        const lang = translations[currentLanguage];
         try {
-            const backupData = {
-                allRetailerData: JSON.parse(localStorage.getItem('allRetailerData')),
-                billCounter: parseInt(localStorage.getItem('billCounter')) || 1
-            };
+            const backupData = { allRetailerData: allRetailerData, billCounter: billCounter };
             const dataStr = JSON.stringify(backupData, null, 2);
             const blob = new Blob([dataStr], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
-            const date = new Date().toISOString().slice(0, 10);
-            link.download = `billing-app-backup-${date}.json`;
+            link.download = `billing-app-backup-${new Date().toISOString().slice(0, 10)}.json`;
             link.href = url;
             link.click();
             URL.revokeObjectURL(url);
-            alert(lang.backupSuccess);
-        } catch (error) {
-            console.error('Backup failed:', error);
-            alert('Backup creation failed.');
-        }
+            alert(translations[currentLanguage].backupSuccess);
+        } catch (error) { console.error('Backup failed:', error); alert('Backup creation failed.'); }
     };
 
     const handleRestoreBackup = (event) => {
         const lang = translations[currentLanguage];
-        if (!confirm(lang.restoreConfirm)) {
-            event.target.value = ''; // Reset file input
-            return;
-        }
+        if (!confirm(lang.restoreConfirm)) { event.target.value = ''; return; }
         const file = event.target.files[0];
         if (file && file.type === "application/json") {
             const reader = new FileReader();
@@ -751,22 +887,169 @@ document.addEventListener('DOMContentLoaded', () => {
                         localStorage.setItem('allRetailerData', JSON.stringify(backupData.allRetailerData));
                         localStorage.setItem('billCounter', backupData.billCounter);
                         alert(lang.restoreSuccess);
-                        initializeApp(); // रिफ्रेश करें
-                    } else {
-                        alert(lang.invalidBackupFile);
-                    }
-                } catch (error) {
-                    console.error('Restore failed:', error);
-                    alert(lang.invalidBackupFile);
-                } finally {
-                    event.target.value = ''; // Reset file input
-                }
+                        initializeApp();
+                    } else { alert(lang.invalidBackupFile); }
+                } catch (error) { console.error('Restore failed:', error); alert(lang.invalidBackupFile); } 
+                finally { event.target.value = ''; }
             };
             reader.readAsText(file);
+        } else { alert(lang.invalidBackupFile); event.target.value = ''; }
+    };
+    
+    // --- पासवर्ड रीसेट हैंडलर्स ---
+    const handleVerifyEmail = () => {
+        const email = document.getElementById('resetEmail').value.toLowerCase();
+        const lang = translations[currentLanguage];
+        if (allRetailerData[email]) {
+            document.getElementById('newPasswordSection').classList.remove('hidden');
+            document.getElementById('resetEmail').disabled = true;
+            document.getElementById('verifyEmailBtn').disabled = true;
         } else {
-            alert(lang.invalidBackupFile);
-            event.target.value = ''; // Reset file input
+            alert(lang.emailNotFound);
         }
+    };
+    
+    const handleResetPassword = (e) => {
+        e.preventDefault();
+        const email = document.getElementById('resetEmail').value.toLowerCase();
+        const phone = document.getElementById('resetPhone').value;
+        const newPassword = document.getElementById('resetNewPassword').value;
+        const confirmPassword = document.getElementById('resetConfirmPassword').value;
+        const lang = translations[currentLanguage];
+
+        if (newPassword !== confirmPassword) {
+            alert(lang.passwordsDoNotMatch);
+            return;
+        }
+        if (!newPassword) {
+             alert(lang.fillAllFields);
+             return;
+        }
+
+        const userData = allRetailerData[email];
+        if (userData && userData.shopDetails.phone === phone) {
+            userData.password = newPassword;
+            saveData();
+            alert(lang.passwordResetSuccess);
+            showPage('login-page');
+        } else {
+            alert(lang.verificationFailed);
+        }
+    };
+
+    // --- आपूर्तिकर्ता फंक्शन ---
+    const handleAddSupplier = (e) => {
+        e.preventDefault();
+        const retailerData = allRetailerData[currentUserEmail];
+        const name = document.getElementById('supplierName').value.trim();
+        const phone = document.getElementById('supplierPhone').value.trim();
+        const address = document.getElementById('supplierAddress').value.trim();
+        const lang = translations[currentLanguage];
+        if (!name || !phone) { alert(lang.fillAllFields); return; }
+
+        if (editingSupplierId) {
+            const supplier = retailerData.suppliers.find(s => s.id === editingSupplierId);
+            if(supplier) Object.assign(supplier, { name, phone, address });
+            document.getElementById('supplierSubmitBtn').innerText = lang.addSupplierBtn;
+            editingSupplierId = null;
+        } else {
+            if (!Array.isArray(retailerData.suppliers)) retailerData.suppliers = [];
+            retailerData.suppliers.push({ id: Date.now(), name, phone, address });
+        }
+        saveData();
+        renderSupplierTable();
+        e.target.reset();
+    };
+
+    app.editSupplier = (supplierId) => {
+        const supplier = allRetailerData[currentUserEmail].suppliers.find(s => s.id === supplierId);
+        if (supplier) {
+            editingSupplierId = supplierId;
+            document.getElementById('supplierName').value = supplier.name;
+            document.getElementById('supplierPhone').value = supplier.phone;
+            document.getElementById('supplierAddress').value = supplier.address;
+            document.getElementById('supplierSubmitBtn').innerText = translations[currentLanguage].updateBtn;
+            showTab('suppliers');
+        }
+    };
+
+    app.deleteSupplier = (supplierId) => {
+        if(confirm(translations[currentLanguage].confirmDeleteSupplier)) {
+            const retailerData = allRetailerData[currentUserEmail];
+            retailerData.suppliers = retailerData.suppliers.filter(s => s.id !== supplierId);
+            saveData();
+            renderSupplierTable();
+        }
+    };
+
+    app.openPurchaseModal = (supplierId) => {
+        currentViewingSupplierId = supplierId;
+        const supplier = allRetailerData[currentUserEmail].suppliers.find(s => s.id === supplierId);
+        if (supplier) {
+            document.getElementById('modalSupplierName').innerText = `${supplier.name} - ${translations[currentLanguage].purchaseEntryTitle}`;
+            renderPurchaseHistory(supplierId);
+            document.getElementById('purchase-entry-modal').style.display = 'block';
+        }
+    };
+    
+    const renderPurchaseHistory = (supplierId) => {
+        const retailerData = allRetailerData[currentUserEmail];
+        const entries = (retailerData.purchaseEntries || []).filter(e => e.supplierId === supplierId).reverse();
+        const container = document.getElementById('purchaseHistoryContainer');
+        const lang = translations[currentLanguage];
+
+        if(entries.length === 0) {
+            container.innerHTML = `<p>${lang.noPurchaseEntries}</p>`;
+            return;
+        }
+
+        container.innerHTML = entries.map(entry => `
+            <div class="history-item">
+                <p><strong>${lang.purchaseDate}:</strong> ${new Date(entry.date).toLocaleString()}</p>
+                <p><strong>${lang.purchaseItems}:</strong> ${entry.item.name} (${entry.item.quantity} ${entry.item.unit}) @ ₹${entry.item.price.toFixed(2)}</p>
+            </div>
+        `).join('');
+    };
+
+    const handleAddPurchaseEntry = (e) => {
+        e.preventDefault();
+        const retailerData = allRetailerData[currentUserEmail];
+        const name = document.getElementById('purchaseProductName').value.trim();
+        const price = parseFloat(document.getElementById('purchasePrice').value);
+        const quantity = parseFloat(document.getElementById('purchaseQuantity').value);
+        const unit = document.getElementById('purchaseUnit').value;
+        const lang = translations[currentLanguage];
+
+        if (!name || isNaN(price) || price <= 0 || isNaN(quantity) || quantity <= 0) {
+            alert(lang.fillAllFields);
+            return;
+        }
+
+        // 1. इन्वेंटरी में उत्पाद जोड़ें या अपडेट करें
+        let inventoryItem = retailerData.inventory.find(item => item.name.toLowerCase() === name.toLowerCase());
+        if (inventoryItem) {
+            // यदि उत्पाद मौजूद है, तो केवल मात्रा बढ़ाएँ
+            inventoryItem.quantity += quantity;
+        } else {
+            // यदि उत्पाद नया है, तो इसे इन्वेंटरी में जोड़ें
+            // बिक्री मूल्य को खरीद मूल्य के बराबर सेट करें, उपयोगकर्ता इसे बाद में बदल सकता है
+            retailerData.inventory.push({ id: Date.now(), name, price: price, quantity, unit });
+        }
+
+        // 2. खरीद प्रविष्टि रिकॉर्ड करें
+        if (!Array.isArray(retailerData.purchaseEntries)) retailerData.purchaseEntries = [];
+        const newEntry = {
+            id: Date.now(),
+            supplierId: currentViewingSupplierId,
+            date: new Date().toISOString(),
+            item: { name, price, quantity, unit }
+        };
+        retailerData.purchaseEntries.push(newEntry);
+
+        saveData();
+        renderPurchaseHistory(currentViewingSupplierId);
+        renderInventoryTable(); // मुख्य इन्वेंटरी तालिका को तुरंत अपडेट करें
+        e.target.reset();
     };
 
     const attachAllEventListeners = () => {
@@ -788,47 +1071,49 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('saveProfileBtn').addEventListener('click', handleSaveProfile);
         document.getElementById('generateBillBtn').addEventListener('click', handleGenerateBill);
 
-        // बैकअप/रिस्टोर इवेंट्स
         document.getElementById('createBackupBtn').addEventListener('click', handleCreateBackup);
         document.getElementById('restoreBackupBtn').addEventListener('click', () => document.getElementById('restoreFileInput').click());
         document.getElementById('restoreFileInput').addEventListener('change', handleRestoreBackup);
         
+        // --- पासवर्ड रीसेट इवेंट्स ---
+        document.getElementById('forgotPasswordLink').addEventListener('click', (e) => { e.preventDefault(); showPage('reset-password-page'); });
+        document.getElementById('resetBackBtn').addEventListener('click', () => showPage('login-page'));
+        document.getElementById('verifyEmailBtn').addEventListener('click', handleVerifyEmail);
+        document.getElementById('resetPasswordForm').addEventListener('submit', handleResetPassword);
+
+        // आपूर्तिकर्ता इवेंट्स
+        document.getElementById('addSupplierForm').addEventListener('submit', handleAddSupplier);
+        document.getElementById('addPurchaseItemForm').addEventListener('submit', handleAddPurchaseEntry);
+        document.getElementById('closePurchaseModalBtn').addEventListener('click', () => document.getElementById('purchase-entry-modal').style.display = 'none');
+
+
+        // रिपोर्ट डाउनलोड इवेंट्स
+        document.getElementById('downloadSalesPdfBtn').addEventListener('click', () => generateSalesReport('pdf'));
+        document.getElementById('downloadSalesCsvBtn').addEventListener('click', () => generateSalesReport('csv'));
+        document.getElementById('downloadStockReportPdfBtn').addEventListener('click', generateStockReportPdf);
+        document.getElementById('downloadStockReportCsvBtn').addEventListener('click', generateStockReportCsv);
+        document.getElementById('downloadCustomersPdfBtn').addEventListener('click', generateCustomerReportPdf);
+        document.getElementById('downloadCustomersCsvBtn').addEventListener('click', generateCustomerReportCsv);
         
-        // --- CUSTOMER SEARCH LOGIC ---
         const customerSearchInput = document.getElementById('billingCustomerName');
         const customerSearchResultsContainer = document.getElementById('customerSearchResultsContainer');
-
         customerSearchInput.addEventListener('input', () => {
             const searchTerm = customerSearchInput.value.toLowerCase().trim();
             customerSearchResultsContainer.innerHTML = ''; 
-            if (searchTerm.length === 0) {
-                customerSearchResultsContainer.classList.add('hidden');
-                return;
-            }
-
-            const customers = allRetailerData[currentUserEmail]?.customers || [];
-            const matches = customers.filter(c => c.name.toLowerCase().includes(searchTerm));
-
+            if (searchTerm.length === 0) { customerSearchResultsContainer.classList.add('hidden'); return; }
+            const matches = (allRetailerData[currentUserEmail]?.customers || []).filter(c => c.name.toLowerCase().includes(searchTerm));
             if (matches.length > 0) {
                 matches.forEach(customer => {
                     const itemDiv = document.createElement('div');
                     itemDiv.className = 'search-item';
                     itemDiv.textContent = `${customer.name} - ${customer.phone}`;
-                    itemDiv.onclick = () => {
-                        document.getElementById('billingCustomerName').value = customer.name;
-                        document.getElementById('billingCustomerPhone').value = customer.phone;
-                        document.getElementById('billingCustomerAddress').value = customer.address || '';
-                        customerSearchResultsContainer.classList.add('hidden');
-                    };
+                    itemDiv.onclick = () => { document.getElementById('billingCustomerName').value = customer.name; document.getElementById('billingCustomerPhone').value = customer.phone; document.getElementById('billingCustomerAddress').value = customer.address || ''; customerSearchResultsContainer.classList.add('hidden'); };
                     customerSearchResultsContainer.appendChild(itemDiv);
                 });
                 customerSearchResultsContainer.classList.remove('hidden');
-            } else {
-                customerSearchResultsContainer.classList.add('hidden');
-            }
+            } else { customerSearchResultsContainer.classList.add('hidden'); }
         });
 
-        // --- PRODUCT SEARCH LOGIC ---
         const searchInput = document.getElementById('productSearchInput');
         const searchResultsContainer = document.getElementById('searchResultsContainer');
         searchInput.addEventListener('input', () => {
@@ -842,22 +1127,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     const itemDiv = document.createElement('div');
                     itemDiv.className = 'search-item';
                     itemDiv.innerHTML = `${product.name} <small>(${stockText}: ${product.quantity} ${product.unit})</small>`;
-                    itemDiv.onclick = () => {
-                        searchInput.value = product.name; selectedProductForBill = product;
-                        searchResultsContainer.classList.add('hidden');
-                    };
+                    itemDiv.onclick = () => { searchInput.value = product.name; selectedProductForBill = product; searchResultsContainer.classList.add('hidden'); };
                     searchResultsContainer.appendChild(itemDiv);
                 });
                 searchResultsContainer.classList.remove('hidden');
             }
         });
 
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.search-container')) {
-                searchResultsContainer.classList.add('hidden');
-                customerSearchResultsContainer.classList.add('hidden');
-            }
-        });
+        document.addEventListener('click', (e) => { if (!e.target.closest('.search-container')) { searchResultsContainer.classList.add('hidden'); customerSearchResultsContainer.classList.add('hidden'); } });
         
         document.getElementById('closeBillModalBtn').addEventListener('click', (e) => {
             document.getElementById('bill-modal').style.display = 'none';
@@ -867,108 +1144,118 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentBillItems = [];
                 updateCurrentBillDisplay();
                 document.getElementById('customerDetailsForm').reset();
-                document.getElementById('billSummary').querySelectorAll('input, select').forEach(i => {
-                    if (i.type === 'number') i.value = 0;
-                    if (i.id === 'discountType') i.value = 'percent';
-                });
+                document.getElementById('discountInput').value = 0;
+                document.getElementById('gstInput').value = 0;
                 calculateFinalTotal();
             }
             e.target.dataset.isReprint = "false";
-            currentBillForModal = null; // मोडल बंद होने पर बिल क्लियर करें
+            currentBillForModal = null;
         });
         
-        document.getElementById('closeHistoryModalBtn').addEventListener('click', () => {
-            document.getElementById('history-modal').style.display = 'none';
-        });
+        document.getElementById('closeHistoryModalBtn').addEventListener('click', () => { document.getElementById('history-modal').style.display = 'none'; });
 
         document.getElementById('sendWhatsAppBtn').addEventListener('click', () => {
             const lang = translations[currentLanguage];
-            if (!currentBillForModal) {
-                alert(lang.noBillToShare);
-                return;
-            }
-
+            if (!currentBillForModal) { alert(lang.noBillToShare); return; }
             const bill = currentBillForModal;
             const retailer = allRetailerData[currentUserEmail];
             const customer = retailer.customers.find(c => c.id == bill.customerId);
-
-            if (!retailer || !customer) {
-                alert(lang.noBillToShare);
-                return;
-            }
-
-            const shopName = retailer.shopDetails.name;
-            let message = `*${shopName}*\n\n`;
-            message += `*${lang.customer}:* ${customer.name}\n`;
-            message += `*${lang.mobile}:* ${customer.phone}\n\n`;
-            message += `*${lang.billNo}:* ${bill.billNo}\n`;
-            message += `*${lang.date}:* ${bill.date} ${bill.time}\n`;
-            message += `----------------------------------\n`;
-            message += bill.items.map(item =>
-                `${item.name} (${item.quantity} ${item.unit}) - ₹${item.total.toFixed(2)}`
-            ).join('\n');
-            message += `\n----------------------------------\n`;
-            message += `${lang.subTotalBill} ₹${bill.subTotal.toFixed(2)}\n`;
-            message += `${lang.discountBill} -₹${bill.discountAmount.toFixed(2)}\n`;
+            if (!retailer || !customer) { alert(lang.noBillToShare); return; }
             const gstValue = bill.subTotal - bill.discountAmount > 0 ? (100 * bill.gstAmount / (bill.subTotal - bill.discountAmount)).toFixed(2) : 0;
-            message += `GST (${gstValue}%): +₹${bill.gstAmount.toFixed(2)}\n\n`;
-            message += `*${lang.grandTotalBill}* *₹${bill.total.toFixed(2)}*\n\n`;
-            message += `${lang.visitAgain} ${lang.thanksForShopping}`;
-
-            const encodedMessage = encodeURIComponent(message);
+            const message = `*${retailer.shopDetails.name}*\n\n*${lang.customer}:* ${customer.name}\n*${lang.mobile}:* ${customer.phone}\n\n*${lang.billNo}:* ${bill.billNo}\n*${lang.date}:* ${bill.date} ${bill.time}\n----------------------------------\n${bill.items.map(item => `${item.name} (${item.quantity} ${item.unit}) - ₹${item.total.toFixed(2)}`).join('\n')}\n----------------------------------\n${lang.subTotalBill} ₹${bill.subTotal.toFixed(2)}\n${lang.discountBill} -₹${bill.discountAmount.toFixed(2)}\nGST (${gstValue}%): +₹${bill.gstAmount.toFixed(2)}\n\n*${lang.grandTotalBill}* *₹${bill.total.toFixed(2)}*\n\n${lang.visitAgain} ${lang.thanksForShopping}`;
             const customerPhone = customer.phone.replace(/[^0-9]/g, '');
-            const whatsappUrl = `https://wa.me/${customerPhone}?text=${encodedMessage}`;
-            window.open(whatsappUrl, '_blank');
+            window.open(`https://wa.me/${customerPhone}?text=${encodeURIComponent(message)}`, '_blank');
         });
 
         document.getElementById('shareBillImageBtn').addEventListener('click', () => {
             const billElement = document.getElementById('bill-to-print');
             const lang = translations[currentLanguage];
             if (!billElement) { alert(lang.noBillToShare); return; }
-
             const button = document.getElementById('shareBillImageBtn');
             const originalText = button.innerText;
-            button.innerText = lang.preparing;
-            button.disabled = true;
-
+            button.innerText = lang.preparing; button.disabled = true;
             html2canvas(billElement, { scale: 2, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
                 canvas.toBlob(function(blob) {
                     const file = new File([blob], 'bill.png', { type: 'image/png' });
-                    
                     if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                        navigator.share({
-                            files: [file],
-                            title: lang.currentBill,
-                            text: lang.customerDetails
-                        })
-                        .finally(() => { button.innerText = originalText; button.disabled = false; setLanguage(currentLanguage); });
+                        navigator.share({ files: [file], title: lang.currentBill, text: lang.customerDetails }).finally(() => { button.innerText = originalText; button.disabled = false; });
                     } else {
-                        const link = document.createElement('a');
-                        link.href = URL.createObjectURL(blob);
-                        link.download = 'bill.png';
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
+                        const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'bill.png';
+                        document.body.appendChild(link); link.click(); document.body.removeChild(link);
                         alert(lang.imageDownloaded);
-                        button.innerText = originalText; button.disabled = false; setLanguage(currentLanguage);
+                        button.innerText = originalText; button.disabled = false;
                     }
                 }, 'image/png');
-            }).catch(err => {
-                console.error("Oops, something went wrong!", err);
-                alert(lang.imageCreationFailed);
-                button.innerText = originalText; button.disabled = false; setLanguage(currentLanguage);
-            });
+            }).catch(err => { console.error("Image creation failed!", err); alert(lang.imageCreationFailed); button.innerText = originalText; button.disabled = false; });
         });
 
         document.getElementById('printBillBtn').addEventListener('click', () => { window.print(); });
 
         const themeToggle = document.getElementById('theme-toggle');
         themeToggle.addEventListener('change', function() {
-            if (this.checked) { document.body.classList.add('dark-mode'); localStorage.setItem('theme', 'dark'); } 
-            else { document.body.classList.remove('dark-mode'); localStorage.setItem('theme', 'light'); }
+            document.body.classList.toggle('dark-mode', this.checked);
+            localStorage.setItem('theme', this.checked ? 'dark' : 'light');
         });
-
         if (localStorage.getItem('theme') === 'dark') { document.body.classList.add('dark-mode'); themeToggle.checked = true; }
+    };
+    
+    // --- रिपोर्ट बनाने वाले फंक्शन ---
+    const generateSalesReport = (format) => {
+        const retailer = allRetailerData[currentUserEmail];
+        const lang = translations[currentLanguage];
+        let fromDate = document.getElementById('salesReportFromDate').value;
+        let toDate = document.getElementById('salesReportToDate').value;
+        if (!fromDate || !toDate) { alert(lang.fillAllFields); return; }
+        fromDate = new Date(fromDate); fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date(toDate); toDate.setHours(23, 59, 59, 999);
+        const filteredBills = (retailer.bills || []).filter(bill => { const [d, m, y] = bill.date.split('-'); return new Date(`${y}-${m}-${d}`) >= fromDate && new Date(`${y}-${m}-${d}`) <= toDate; });
+        if (filteredBills.length === 0) { alert(lang.noDataFound); return; }
+        const headers = [lang.billNo, lang.billDate, lang.customerName, lang.total];
+        const data = filteredBills.map(bill => [bill.billNo, bill.date, (retailer.customers.find(c => c.id === bill.customerId) || {}).name || 'N/A', bill.total.toFixed(2)]);
+        const reportTitle = `${lang.salesReportTitle} (${fromDate.toLocaleDateString()} - ${toDate.toLocaleDateString()})`;
+        if (format === 'pdf') {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.text(reportTitle, 14, 15);
+            doc.autoTable({ head: [headers], body: data, startY: 20 });
+            doc.save(`Sales-Report-${Date.now()}.pdf`);
+        } else if (format === 'csv') {
+            downloadCsv(`Sales-Report-${Date.now()}.csv`, headers, data.map(row => [row[0], row[1], row[2], row[3]]));
+        }
+    };
+    
+    const generateStockReportPdf = () => {
+        const { jsPDF } = window.jspdf;
+        const lang = translations[currentLanguage];
+        const doc = new jsPDF();
+        doc.text(lang.stockReport, 14, 15);
+        const tableData = (allRetailerData[currentUserEmail].inventory || []).map(p => [p.name, p.price.toFixed(2), p.quantity, p.unit]);
+        doc.autoTable({ head: [[lang.productColumn, lang.priceColumn, lang.quantityColumn, lang.unitLabel]], body: tableData, startY: 20 });
+        doc.save(`${lang.stockReport}-${Date.now()}.pdf`);
+    };
+
+    const generateStockReportCsv = () => {
+        const lang = translations[currentLanguage];
+        const headers = [lang.productColumn, lang.priceColumn, lang.quantityColumn, lang.unitLabel];
+        const data = (allRetailerData[currentUserEmail].inventory || []).map(p => [p.name, p.price.toFixed(2), p.quantity, p.unit]);
+        downloadCsv(`Stock-Report-${Date.now()}.csv`, headers, data);
+    };
+
+    const generateCustomerReportPdf = () => {
+        const { jsPDF } = window.jspdf;
+        const lang = translations[currentLanguage];
+        const doc = new jsPDF();
+        doc.text(lang.customerList, 14, 15);
+        const tableData = (allRetailerData[currentUserEmail].customers || []).map(c => [c.name, c.phone, c.address || '']);
+        doc.autoTable({ head: [[lang.nameColumn, lang.phoneColumn, lang.customerAddress]], body: tableData, startY: 20 });
+        doc.save(`Customer-List-${Date.now()}.pdf`);
+    };
+    
+    const generateCustomerReportCsv = () => {
+        const lang = translations[currentLanguage];
+        const headers = [lang.nameColumn, lang.phoneColumn, lang.customerAddress];
+        const data = (allRetailerData[currentUserEmail].customers || []).map(c => [c.name, c.phone, c.address || '']);
+        downloadCsv(`Customer-List-${Date.now()}.csv`, headers, data);
     };
 
     // --- ऐप शुरू करें ---
