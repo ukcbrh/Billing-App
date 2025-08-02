@@ -108,6 +108,55 @@
         #purchase-tab, #purchase-tab input, #purchase-tab select, #purchase-tab textarea { font-family: 'Segoe UI', sans-serif; }
         .profile-image-upload { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; margin-top: 10px; }
         .profile-image-upload img { max-width: 150px; max-height: 80px; border: 1px solid var(--border-color); padding: 5px; }
+        #item-details-calculator { border: 1px solid var(--border-color); padding: 15px; margin-top: 15px; border-radius: 5px; }
+        .item-calc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .item-calc-grid label { margin-bottom: 5px; }
+        .item-calc-grid input { margin-bottom: 5px; }
+
+        /* Profile Sidebar Styles */
+        #sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1001;
+        }
+        .sidebar {
+            position: fixed;
+            top: 0;
+            right: -450px; /* Start off-screen */
+            width: 400px;
+            max-width: 90%;
+            height: 100%;
+            background-color: var(--container-bg);
+            box-shadow: -2px 0 8px rgba(0,0,0,0.15);
+            z-index: 1002;
+            transition: right 0.3s ease-in-out;
+            overflow-y: auto;
+            padding: 20px;
+            padding-top: 50px; /* Space for close button */
+            box-sizing: border-box;
+        }
+        .sidebar.open {
+            right: 0; /* Slide in */
+        }
+        .close-sidebar-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 2.5rem;
+            font-weight: bold;
+            line-height: 1;
+            color: var(--text-color);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            width: auto;
+            margin: 0;
+        }
 
 
         @media print {
@@ -181,13 +230,7 @@
         
         <!-- डैशबोर्ड टैब -->
         <div id="dashboard-tab" class="tab-content active">
-             <div class="dashboard-grid">
-                <div class="dashboard-card"><h5 data-lang-key="totalSales">कुल बिक्री</h5><p style="color: #27ae60;" id="totalSalesDisplay">₹0.00</p></div>
-                <div class="dashboard-card"><h5 data-lang-key="totalPurchases">कुल खरीद</h5><p style="color: #e74c3c;" id="totalPurchasesDisplay">₹0.00</p></div>
-                <div class="dashboard-card"><h5 data-lang-key="totalExpenses">कुल खर्च</h5><p class="loss" id="totalExpensesDisplay">₹0.00</p></div>
-                <div class="dashboard-card"><h5 data-lang-key="totalBillsGenerated">कुल बिल</h5><p id="totalBillsDisplay">0</p></div>
-            </div>
-            <div class="dashboard-charts-grid">
+             <div class="dashboard-charts-grid">
                  <div class="chart-container">
                     <h4 data-lang-key="salesPurchaseChartTitle">बिक्री और खरीद</h4>
                      <canvas id="salesPurchaseChart"></canvas>
@@ -196,6 +239,12 @@
                      <h4 data-lang-key="profitAndLoss">लाभ और हानि</h4>
                      <canvas id="profitLossChart"></canvas>
                  </div>
+            </div>
+             <div class="dashboard-grid">
+                <div class="dashboard-card"><h5 data-lang-key="totalSales">कुल बिक्री</h5><p style="color: #27ae60;" id="totalSalesDisplay">₹0.00</p></div>
+                <div class="dashboard-card"><h5 data-lang-key="totalPurchases">कुल खरीद</h5><p style="color: #e74c3c;" id="totalPurchasesDisplay">₹0.00</p></div>
+                <div class="dashboard-card"><h5 data-lang-key="totalExpenses">कुल खर्च</h5><p class="loss" id="totalExpensesDisplay">₹0.00</p></div>
+                <div class="dashboard-card"><h5 data-lang-key="totalBillsGenerated">कुल बिल</h5><p id="totalBillsDisplay">0</p></div>
             </div>
              <div class="chart-container">
                 <h4 data-lang-key="topSellingProducts">सबसे ज्यादा बिकने वाले उत्पाद</h4>
@@ -221,25 +270,42 @@
                         <label><input type="radio" name="itemType" value="product" checked> <span data-lang-key="product">उत्पाद</span></label>
                         <label><input type="radio" name="itemType" value="service"> <span data-lang-key="service">सर्विस</span></label>
                     </div>
-                    <form id="addItemForm">
-                        <div id="product-fields">
-                             <div class="search-container"><label data-lang-key="productSearch">उत्पाद खोजें:</label><input type="text" id="productSearchInput" autocomplete="off"><div id="searchResultsContainer" class="search-results hidden"></div></div>
-                             <label data-lang-key="quantity">मात्रा:</label><input type="number" id="itemQuantity" min="0.01" step="0.01" value="1" required>
-                        </div>
-                         <div id="service-fields" class="hidden">
-                             <label data-lang-key="serviceDescription">सर्विस विवरण:</label><input type="text" id="serviceDescriptionInput">
-                             <label data-lang-key="serviceCharge">सर्विस चार्ज (₹):</label><input type="number" id="serviceChargeInput" min="0">
-                        </div>
-                        <button type="submit" data-lang-key="addToBill">बिल में जोड़ें</button>
-                    </form>
+                    <div id="product-fields">
+                         <div class="search-container"><label data-lang-key="addProductLabel">उत्पाद जोड़ें:</label><input type="text" id="productSearchInput" autocomplete="off"><div id="searchResultsContainer" class="search-results hidden"></div></div>
+                         <div id="item-details-calculator" class="hidden">
+                             <h5 id="calculatorProductName"></h5>
+                             <div class="item-calc-grid">
+                                <div><label data-lang-key="quantity">मात्रा:</label><input type="number" id="calcQuantity" value="1" min="0.01" step="0.01"></div>
+                                <div><label data-lang-key="unitLabel">इकाई:</label><input type="text" id="calcUnit" readonly></div>
+                                <div><label data-lang-key="basePrice">बेस प्राइस (₹):</label><input type="number" id="calcBasePrice" min="0" step="0.01"></div>
+                                <div><label data-lang-key="gstPercent">GST (%):</label><input type="number" id="calcGstPercent" min="0" step="0.01" value="0"></div>
+                             </div>
+                             <div><label data-lang-key="totalPrice">कुल मूल्य/इकाई (₹):</label><input type="number" id="calcTotalPrice" min="0" step="0.01"></div>
+                             <p><strong><span data-lang-key="lineTotal">कुल:</span> ₹<span id="calcLineTotal">0.00</span></strong></p>
+                             <button type="button" id="addItemToBillBtn" data-lang-key="addToBill">बिल में जोड़ें</button>
+                         </div>
+                    </div>
+                     <div id="service-fields" class="hidden">
+                         <label data-lang-key="serviceDescription">सर्विस विवरण:</label><input type="text" id="serviceDescriptionInput">
+                         <label data-lang-key="serviceCharge">सर्विस चार्ज (₹):</label><input type="number" id="serviceChargeInput" min="0">
+                         <div class="radio-group" style="margin-bottom: 10px;">
+                            <label><input type="radio" name="serviceGstType" value="without_gst" checked> <span data-lang-key="withoutGst">बिना GST</span></label>
+                            <label><input type="radio" name="serviceGstType" value="with_gst"> <span data-lang-key="withGst">GST सहित</span></label>
+                         </div>
+                         <div id="service-gst-field-container" class="hidden" style="margin-bottom: 15px;">
+                            <label data-lang-key="gstPercent">GST (%):</label>
+                            <input type="number" id="serviceGstPercent" min="0" step="0.01" value="0">
+                         </div>
+                        <button type="button" id="addServiceToBillBtn" data-lang-key="addToBill">बिल में जोड़ें</button>
+                    </div>
                 </div>
                 <div>
                     <h4 data-lang-key="currentBill">वर्तमान बिल</h4>
                     <table class="data-table"><thead><tr><th data-lang-key="productColumn">उत्पाद/सर्विस</th><th data-lang-key="quantityColumn">मात्रा</th><th data-lang-key="priceColumn">मूल्य</th><th data-lang-key="totalColumn">कुल</th></tr></thead><tbody id="currentBillBody"></tbody></table>
                     <div style="text-align:right; margin-top:15px;" id="billSummary">
                         <div class="bill-summary-row"><span data-lang-key="subTotal">उप-योग (Subtotal):</span><span>₹<span id="subTotalDisplay">0.00</span></span></div>
+                        <div class="bill-summary-row"><span data-lang-key="totalGst">कुल GST:</span><span>+ ₹<span id="totalGstDisplay">0.00</span></span></div>
                         <div class="bill-summary-row" style="align-items:center;"><label for="discountInput" style="margin:0; text-align:right; margin-right:10px;" data-lang-key="discount">डिस्काउंट:</label><div style="display:flex; width: 60%;"><input type="number" id="discountInput" style="width: 70%; margin:0;" value="0"><select id="discountType" style="width: 30%; margin:0; padding:10px 5px;"><option value="percent">%</option><option value="fixed">₹</option></select></div></div>
-                        <div class="bill-summary-row"><span data-lang-key="gst">GST (%):</span><input type="number" id="gstInput" value="0" style="width:60%; margin:0;"></div>
                         <div class="bill-summary-row grand-total"><span data-lang-key="grandTotal">कुल देय:</span><span>₹<span id="grandTotalDisplay">0.00</span></span></div>
                     </div>
                     <button id="generateBillBtn" style="margin-top: 20px;" data-lang-key="generateBill">बिल बनाएं</button>
@@ -255,15 +321,20 @@
                     <form id="addPurchaseItemForm">
                          <h5 data-lang-key="supplierDetails" style="border:none;">आपूर्तिकर्ता विवरण</h5>
                          <div class="customer-details-grid">
-                            <div><label data-lang-key="supplierName">आपूर्तिकर्ता का नाम:</label><input type="text" id="purchaseSupplierName" required></div>
+                            <div class="search-container"><label data-lang-key="supplierName">आपूर्तिकर्ता का नाम:</label><input type="text" id="purchaseSupplierName" required autocomplete="off"><div id="supplierPurchaseSearchResultsContainer" class="search-results hidden"></div></div>
                             <div><label data-lang-key="supplierPhone">आपूर्तिकर्ता का फ़ोन:</label><input type="tel" id="purchaseSupplierPhone" required></div>
                         </div>
+                        <label data-lang-key="supplierAddressLabel">आपूर्तिकर्ता का पता:</label><textarea id="purchaseSupplierAddress" rows="1"></textarea>
+                        <label data-lang-key="purchaseBillNo">खरीद बिल नंबर:</label><input type="text" id="purchaseBillNo">
                         <hr style="margin:20px 0;">
                         <h5 data-lang-key="addProductToPurchase" style="border:none;">खरीद में उत्पाद जोड़ें</h5>
                         <div><label data-lang-key="productName">उत्पाद का नाम</label><input type="text" id="purchaseProductName" required></div>
                         <div class="purchase-form-grid">
-                            <div><label data-lang-key="priceLabel">मूल्य</label><input type="number" id="purchaseBasePrice" required min="0.01" step="0.01"></div>
-                            <div class="radio-group" style="margin-bottom:0;">
+                           <div><label data-lang-key="purchasePrice">खरीद मूल्य (₹)</label><input type="number" id="purchaseBasePrice" required min="0.01" step="0.01"></div>
+                           <div><label data-lang-key="sellingPriceLabel">बिक्री मूल्य (₹)</label><input type="number" id="purchaseSellingPrice" required min="0.01" step="0.01"></div>
+                        </div>
+                        <div class="purchase-form-grid">
+                             <div class="radio-group" style="margin-bottom:0;">
                                 <label><input type="radio" name="gstType" value="without_gst" checked> <span data-lang-key="withoutGst">बिना GST</span></label>
                                 <label><input type="radio" name="gstType" value="with_gst"> <span data-lang-key="withGst">GST सहित</span></label>
                             </div>
@@ -329,6 +400,8 @@
                         <input type="tel" id="supplierPhone" required>
                         <label data-lang-key="supplierAddress">आपूर्तिकर्ता का पता:</label>
                         <textarea id="supplierAddress" rows="2"></textarea>
+                        <label data-lang-key="gstinLabel">GST नंबर:</label>
+                        <input type="text" id="supplierGstin">
                         <button type="submit" id="supplierSubmitBtn" data-lang-key="addSupplierBtn">आपूर्तिकर्ता जोड़ें</button>
                     </form>
                 </div>
@@ -359,6 +432,8 @@
                         <input type="tel" id="addCustomerPhone" required>
                         <label data-lang-key="customerAddress">ग्राहक का पता:</label>
                         <textarea id="addCustomerAddress" rows="2"></textarea>
+                        <label data-lang-key="gstinLabel">GST नंबर:</label>
+                        <input type="text" id="addCustomerGstin">
                         <button type="submit" id="customerSubmitBtn" data-lang-key="addCustomerBtn">ग्राहक जोड़ें</button>
                     </form>
                 </div>
@@ -393,6 +468,18 @@
                 <button id="downloadSalesCsvBtn" data-lang-key="downloadAsCsv">CSV में डाउनलोड करें</button>
             </div>
              <div class="report-section">
+                <h5 data-lang-key="purchaseReportTitle">खरीद रिपोर्ट</h5>
+                <p data-lang-key="purchaseReportDesc" style="border:none; margin-bottom:15px; text-align:left;">एक तिथि सीमा के भीतर सभी खरीद की विस्तृत सूची डाउनलोड करें।</p>
+                <div style="display: flex; flex-wrap:wrap; gap: 15px; align-items: center; margin-bottom: 15px;">
+                     <label data-lang-key="fromDate" style="width:auto; margin-bottom:0;">से:</label>
+                     <input type="date" id="purchaseReportFromDate" style="width:150px; margin-bottom:0;">
+                     <label data-lang-key="toDate" style="width:auto; margin-bottom:0;">तक:</label>
+                     <input type="date" id="purchaseReportToDate" style="width:150px; margin-bottom:0;">
+                </div>
+                <button id="downloadPurchasePdfBtn" data-lang-key="downloadAsPdf">PDF में डाउनलोड करें</button>
+                <button id="downloadPurchaseCsvBtn" data-lang-key="downloadAsCsv">CSV में डाउनलोड करें</button>
+            </div>
+             <div class="report-section">
                 <h5 data-lang-key="stockReportTitle">स्टॉक रिपोर्ट</h5>
                 <p data-lang-key="stockReportDesc" style="border:none; margin-bottom:15px; text-align:left;">वर्तमान में उपलब्ध सभी उत्पादों की सूची डाउनलोड करें।</p>
                 <button id="downloadStockReportPdfBtn" data-lang-key="downloadAsPdf">PDF में डाउनलोड करें</button>
@@ -406,8 +493,21 @@
             </div>
         </div>
 
-        <div id="profile-tab" class="tab-content">
-            <div class="profile-layout" style="grid-template-columns: 1fr 1fr; gap: 30px;">
+        <div id="backup-tab" class="tab-content">
+            <h4 data-lang-key="backupRestoreTitle">बैकअप और रिस्टोर</h4>
+            <div class="backup-container">
+                <p data-lang-key="backupInstructions">अपने सभी डेटा (उत्पाद, ग्राहक, बिल आदि) को एक फ़ाइल के रूप में डाउनलोड करने के लिए 'बैकअप बनाएं' पर क्लिक करें। इस फ़ाइल को सुरक्षित रखें। डेटा वापस पाने के लिए 'बैकअप से रिस्टोर करें' का उपयोग करें।</p>
+                <button id="createBackupBtn" data-lang-key="createBackup">बैकअप बनाएं</button>
+                <button id="restoreBackupBtn" style="background-color: #27ae60;" data-lang-key="restoreBackup">बैकअप से रिस्टोर करें</button>
+                <input type="file" id="restoreFileInput" class="hidden" accept=".json">
+            </div>
+        </div>
+
+        <!-- Profile Sidebar -->
+        <div id="sidebar-overlay" class="hidden"></div>
+        <div id="profile-sidebar" class="sidebar">
+            <button id="closeProfileSidebarBtn" class="close-sidebar-btn">×</button>
+            <div class="profile-layout" style="grid-template-columns: 1fr; gap: 30px;">
                 <div>
                     <h4 data-lang-key="shopDetails">दुकान का विवरण</h4>
                     <label data-lang-key="shopNameLabel">दुकान का नाम:</label><input type="text" id="profileShopName">
@@ -437,15 +537,6 @@
                 </div>
             </div>
             <button id="saveProfileBtn" style="margin-top:20px;" data-lang-key="saveProfile">प्रोफ़ाइल सेव करें</button>
-        </div>
-        <div id="backup-tab" class="tab-content">
-            <h4 data-lang-key="backupRestoreTitle">बैकअप और रिस्टोर</h4>
-            <div class="backup-container">
-                <p data-lang-key="backupInstructions">अपने सभी डेटा (उत्पाद, ग्राहक, बिल आदि) को एक फ़ाइल के रूप में डाउनलोड करने के लिए 'बैकअप बनाएं' पर क्लिक करें। इस फ़ाइल को सुरक्षित रखें। डेटा वापस पाने के लिए 'बैकअप से रिस्टोर करें' का उपयोग करें।</p>
-                <button id="createBackupBtn" data-lang-key="createBackup">बैकअप बनाएं</button>
-                <button id="restoreBackupBtn" style="background-color: #27ae60;" data-lang-key="restoreBackup">बैकअप से रिस्टोर करें</button>
-                <input type="file" id="restoreFileInput" class="hidden" accept=".json">
-            </div>
         </div>
     </div>
     
@@ -510,7 +601,7 @@ document.addEventListener('DOMContentLoaded', () => {
             sellTab: "बिक्री", purchaseTab: "खरीद", inventoryTab: "इन्वेंटरी", expensesTab: "खर्चे", 
             customersTab: "ग्राहक", suppliersTab: "आपूर्तिकर्ता", profileTab: "प्रोफ़ाइल", backupRestoreTab: "बैकअप/रिस्टोर",
             reportsTab: "रिपोर्ट्स", customerDetails: "ग्राहक का विवरण", customerName: "ग्राहक का नाम:", customerPhone: "ग्राहक का फ़ोन:", customerAddress: "ग्राहक का पता:",
-            addItem: "आइटम जोड़ें", productSearch: "उत्पाद खोजें:", quantity: "मात्रा:", addToBill: "बिल में जोड़ें",
+            addItem: "आइटम जोड़ें", addProductLabel: "उत्पाद जोड़ें:", quantity: "मात्रा:", addToBill: "बिल में जोड़ें",
             currentBill: "वर्तमान बिल", productColumn: "उत्पाद", quantityColumn: "मात्रा", priceColumn: "मूल्य", totalColumn: "कुल",
             rateColumn: "दर", subTotal: "उप-योग (Subtotal):", discount: "डिस्काउंट:", gst: "GST (%):", grandTotal: "कुल देय:",
             generateBill: "बिल बनाएं", addProduct: "नया उत्पाद जोड़ें / अपडेट करें", productName: "उत्पाद का नाम:", priceLabel: "बिक्री मूल्य (₹):",
@@ -554,10 +645,10 @@ document.addEventListener('DOMContentLoaded', () => {
             purchaseEntryTitle: "नई खरीद प्रविष्टि", addProductToPurchase: "खरीद में उत्पाद जोड़ें", purchasePrice: "खरीद मूल्य (₹)",
             addToPurchaseAndInventory: "खरीद रिकॉर्ड करें और स्टॉक में जोड़ें", purchaseHistoryTitle: "आपूर्तिकर्ता का खरीद इतिहास", purchaseDate: "खरीद की तारीख",
             purchaseItems: "खरीदे गए आइटम", noPurchaseEntries: "इस आपूर्तिकर्ता के लिए कोई खरीद प्रविष्टि नहीं है।",
-            gstinLabel: "जीएसटी नंबर:", gstinBill: "जीएसटी नंबर:",
+            gstinLabel: "GST नंबर:", gstinBill: "जीएसटी नंबर:",
             addCustomer: "नया ग्राहक जोड़ें", addCustomerBtn: "ग्राहक जोड़ें", customerAddedSuccess: "ग्राहक सफलतापूर्वक जोड़ा गया!",
             cropImageTitle: "लोगो क्रॉप करें", cropBtn: "क्रॉप करें और सेव करें", cancel: "रद्द करें",
-            supplierDetails: "आपूर्तिकर्ता विवरण", basePrice: "बेस प्राइस (बिना GST)", gstPercent: "GST (%)", recentPurchases: "हाल की खरीद",
+            supplierDetails: "आपूर्तिकर्ता विवरण", basePrice: "बेस प्राइस (₹):", gstPercent: "GST (%):", recentPurchases: "हाल की खरीद",
             selectSupplierToViewHistory: "आपूर्तिकर्ता की सभी खरीद देखने के लिए 'आपूर्तिकर्ता' टैब पर जाएं।",
             addExpenseTitle: "नया खर्च जोड़ें", expenseDescription: "खर्च का विवरण:", expenseAmount: "राशि (₹):",
             expenseDate: "खर्च की तारीख:", addExpenseBtn: "खर्च जोड़ें", expenseListTitle: "खर्चों की सूची",
@@ -566,7 +657,9 @@ document.addEventListener('DOMContentLoaded', () => {
             totalSales: "कुल बिक्री", totalPurchases: "कुल खरीद", salesPurchaseChartTitle: "बिक्री और खरीद", profitAndLoss: "लाभ और हानि",
             product: "उत्पाद", service: "सर्विस", serviceDescription: "सर्विस विवरण:", serviceCharge: "सर्विस चार्ज (₹):",
             withoutGst: "बिना GST", withGst: "GST सहित", printPurchaseNote: "खरीद नोट प्रिंट करें",
-            signature: "हस्ताक्षर:", stamp: "स्टाम्प:", authorizedSignatory: "अधिकृत हस्ताक्षरकर्ता"
+            signature: "हस्ताक्षर:", stamp: "स्टाम्प:", authorizedSignatory: "अधिकृत हस्ताक्षरकर्ता",
+            purchaseReportTitle: "खरीद रिपोर्ट", purchaseReportDesc: "एक तिथि सीमा के भीतर सभी खरीद की विस्तृत सूची डाउनलोड करें।", supplierAddressLabel: "आपूर्तिकर्ता का पता:",
+            purchaseId: "खरीद आईडी", totalPrice: "कुल मूल्य/इकाई (₹):", lineTotal: "कुल:", sellingPriceLabel: "बिक्री मूल्य (₹):", totalGst: "कुल GST:", purchaseBillNo: "खरीद बिल नंबर:"
         },
         'en': {
             welcomeTitle: "Welcome Billing App", login: "Login", createAccount: "Create New Account", back: "← Back",
@@ -576,7 +669,7 @@ document.addEventListener('DOMContentLoaded', () => {
             sellTab: "Sell", purchaseTab: "Purchase", inventoryTab: "Inventory", expensesTab: "Expenses",
             customersTab: "Customers", suppliersTab: "Suppliers", profileTab: "Profile", backupRestoreTab: "Backup/Restore",
             reportsTab: "Reports", customerDetails: "Customer Details", customerName: "Customer Name:", customerPhone: "Customer Phone:", customerAddress: "Customer Address:",
-            addItem: "Add Item", productSearch: "Search Product:", quantity: "Quantity:", addToBill: "Add to Bill",
+            addItem: "Add Item", addProductLabel: "Add Product:", quantity: "Quantity:", addToBill: "Add to Bill",
             currentBill: "Current Bill", productColumn: "Product", quantityColumn: "Quantity", priceColumn: "Price", totalColumn: "Total",
             rateColumn: "Rate", subTotal: "Subtotal:", discount: "Discount:", gst: "GST (%):", grandTotal: "Grand Total:",
             generateBill: "Generate Bill", addProduct: "Add / Update Product", productName: "Product Name:", priceLabel: "Selling Price (₹):",
@@ -623,7 +716,7 @@ document.addEventListener('DOMContentLoaded', () => {
             gstinLabel: "GST Number:", gstinBill: "GSTIN:",
             addCustomer: "Add New Customer", addCustomerBtn: "Add Customer", customerAddedSuccess: "Customer added successfully!",
             cropImageTitle: "Crop Logo", cropBtn: "Crop & Save", cancel: "Cancel",
-            supplierDetails: "Supplier Details", basePrice: "Base Price (w/o GST)", gstPercent: "GST (%)", recentPurchases: "Recent Purchases",
+            supplierDetails: "Supplier Details", basePrice: "Base Price (₹):", gstPercent: "GST (%):", recentPurchases: "Recent Purchases",
             selectSupplierToViewHistory: "Go to the 'Suppliers' tab to see all purchases for a supplier.",
             addExpenseTitle: "Add New Expense", expenseDescription: "Expense Description:", expenseAmount: "Amount (₹):",
             expenseDate: "Expense Date:", addExpenseBtn: "Add Expense", expenseListTitle: "Expense List",
@@ -632,7 +725,9 @@ document.addEventListener('DOMContentLoaded', () => {
             totalSales: "Total Sales", totalPurchases: "Total Purchases", salesPurchaseChartTitle: "Sales & Purchases", profitAndLoss: "Profit & Loss",
             product: "Product", service: "Service", serviceDescription: "Service Description:", serviceCharge: "Service Charge (₹):",
             withoutGst: "Without GST", withGst: "With GST", printPurchaseNote: "Print Purchase Note",
-            signature: "Signature:", stamp: "Stamp:", authorizedSignatory: "Authorized Signatory"
+            signature: "Signature:", stamp: "Stamp:", authorizedSignatory: "Authorized Signatory",
+            purchaseReportTitle: "Purchase Report", purchaseReportDesc: "Download a detailed list of all purchases within a date range.", supplierAddressLabel: "Supplier Address:",
+            purchaseId: "Purchase ID", totalPrice: "Total Price/Unit (₹):", lineTotal: "Total:", sellingPriceLabel: "Selling Price (₹):", totalGst: "Total GST:", purchaseBillNo: "Purchase Bill No:"
         },
         'ur': {
             welcomeTitle: "Welcome Billing App", login: "لاگ ان کریں", createAccount: "نیا اکاؤنٹ بنائیں", back: "← واپس",
@@ -642,7 +737,7 @@ document.addEventListener('DOMContentLoaded', () => {
             sellTab: "فروخت", purchaseTab: "خرید", inventoryTab: "انوینٹری", expensesTab: "اخراجات",
             customersTab: "صارفین", suppliersTab: "سپلائرز", profileTab: "پروفائل", backupRestoreTab: "بیک اپ/ریسٹور",
             reportsTab: "رپورٹس", customerDetails: "صارف کی تفصیلات", customerName: "صارف کا نام:", customerPhone: "صارف کا فون:", customerAddress: "صارف کا پتہ:",
-            addItem: "آئٹم شامل کریں", productSearch: "پروڈکٹ تلاش کریں:", quantity: "مقدار:", addToBill: "بل میں شامل کریں",
+            addItem: "آئٹم شامل کریں", addProductLabel: "پروڈکٹ شامل کریں:", quantity: "مقدار:", addToBill: "بل میں شامل کریں",
             currentBill: "موجودہ بل", productColumn: "پروڈکٹ", quantityColumn: "مقدار", priceColumn: "قیمت", totalColumn: "کل",
             rateColumn: "شرح", subTotal: "ذیلی کل:", discount: "رعایت:", gst: "جی ایس ٹی (%):", grandTotal: "کل قابل ادائیگی:",
             generateBill: "بل بنائیں", addProduct: "نیا پروڈکٹ شامل کریں / اپ ڈیٹ کریں", productName: "پروڈکٹ کا نام:", priceLabel: "فروخت کی قیمت (₹):",
@@ -658,14 +753,14 @@ document.addEventListener('DOMContentLoaded', () => {
             productUpdatedSuccess: "پروڈکٹ کامیابی سے اپ ڈیٹ ہو گیا!", quantityUpdatedSuccess: "مصنوعات کی مقدار کو اپ ڈیٹ کر دیا گیا ہے!",
             selectProductFromList: "براہ کرم فہرست سے ایک پروڈکٹ منتخب کریں۔", stockUnavailable: "اسٹاک میں صرف {quantity} {unit} دستیاب ہے!",
             addItemsToBill: "بل بنانے کے لیے آئٹمز شامل کریں۔", customerInfoRequired: "بل بنانے کے لیے صارف کا نام اور फ़ोन नंबर आवश्यक है।",
-            profileSaved: "پروفائل محفوظ ہوگیا!", noBillToShare: "شیئر کرنے کے لیے کوئی بل نہیں ہے۔", preparing: "تیار ہو رہا ہے...",
+            profileSaved: "پروفائل محفوظ ہوگیا!", noBillToShare: "شیئر करने के लिए کوئی بل نہیں ہے۔", preparing: "تیار ہو رہا ہے...",
             imageCreationFailed: "تصویر بنانے میں خرابی۔", imageDownloaded: "بل کی تصویر ڈاؤن لوڈ ہو گئی ہے۔ براہ کرم اسے دستی طور پر شیئر کریں۔",
             noPurchaseHistory: "اس سپلائر کے لیے خریداری کی کوئی تاریخ نہیں ملی۔", noSalesHistory: "اس گاہک کے لیے فروخت کی کوئی تاریخ نہیں ملی۔",
             billNo: "بل نمبر:", date: "تاریخ:", total: "کل:", viewBill: "بل دیکھیں",
             stockReport: "اسٹاک رپورٹ", customer: "صارف:", name: "نام:", mobile: "موبائل:", subTotalBill: "ذیلی کل:", discountBill: "رعایت:",
             grandTotalBill: "کل قابل ادائیگی:", scanToPay: "ادائیگی کے لیے اسکین کریں", visitAgain: "دوبارہ تشریف لائیں!", thanksForShopping: "خریداری کے لئے شکریہ!",
             editBtn: "ترمیم", deleteBtn: "حذف کریں", updateBtn: "اپ ڈیٹ", deleteConfirm: "کیا آپ واقعی اس آئٹم کو حذف کرنا چاہتے ہیں؟",
-            backupRestoreTitle: "بیک اپ اور ریسٹور", backupInstructions: "اپنے تمام ڈیٹا کو ڈاؤن لوڈ کرنے کے لیے 'بیک اپ بنائیں' پر کلک کریں۔ اپنا ڈیٹا بازیافت کرنے کے لیے 'بیک اپ سے بحال کریں' کا استعمال کریں۔",
+            backupRestoreTitle: "بیک اپ اور ریسٹور", backupInstructions: "اپنے تمام ڈیٹا کو ڈاؤن لوڈ करने के लिए 'بیک اپ بنائیں' پر کلک کریں۔ اپنا ڈیٹا بازیافت करने के लिए 'بیک اپ سے بحال کریں' کا استعمال کریں۔",
             createBackup: "بیک اپ بنائیں", restoreBackup: "بیک اپ سے بحال کریں", restoreConfirm: "کیا آپ واقعی بحال کرنا چاہتے ہیں؟ یہ تمام موجودہ ڈیٹا کو اوور رائٹ کر دے گا۔",
             backupSuccess: "بیک اپ فائل کامیابی سے بن گئی۔", restoreSuccess: "ڈیٹا کامیابی سے بحال ہو گیا۔", invalidBackupFile: "غلط بیک اپ فائل۔",
             totalRevenue: "کل آمدنی", totalBillsGenerated: "کل بل", currentStockValue: "موجودہ اسٹاک کی قیمت",
@@ -689,7 +784,7 @@ document.addEventListener('DOMContentLoaded', () => {
             gstinLabel: "جی ایس ٹی نمبر:", gstinBill: "جی ایس ٹی آئی این:",
             addCustomer: "نیا گاہک شامل کریں", addCustomerBtn: "گاہک شامل کریں", customerAddedSuccess: "گاہک کامیابی سے شامل ہو گیا!",
             cropImageTitle: "لوگو کو کٹاؤ", cropBtn: "کراپ کریں اور محفوظ کریں", cancel: "منسوخ کریں",
-            supplierDetails: "سپلائر کی تفصیلات", basePrice: "بنیادی قیمت (بغیر جی ایس ٹی)", gstPercent: "جی ایس ٹی (٪)", recentPurchases: "حالیہ خریداری",
+            supplierDetails: "سپلائر کی تفصیلات", basePrice: "بنیادی قیمت (₹):", gstPercent: "جی ایس ٹی (٪):", recentPurchases: "حالیہ خریداری",
             selectSupplierToViewHistory: "کسی سپلائر کی تمام خریداری دیکھنے کے لیے 'سپلائرز' ٹیب پر جائیں۔",
             addExpenseTitle: "نیا خرچ شامل کریں", expenseDescription: "خرچ کی تفصیل:", expenseAmount: "رقم (₹):",
             expenseDate: "خرچ کی تاریخ:", addExpenseBtn: "خرچ شامل کریں", expenseListTitle: "اخراجات کی فہرست",
@@ -698,12 +793,14 @@ document.addEventListener('DOMContentLoaded', () => {
             totalSales: "کل فروخت", totalPurchases: "کل خرید", salesPurchaseChartTitle: "فروخت اور خرید", profitAndLoss: "منافع اور نقصان",
             product: "پروڈکٹ", service: "سروس", serviceDescription: "سروس کی تفصیل:", serviceCharge: "سروس چارج (₹):",
             withoutGst: "بغیر جی ایس ٹی", withGst: "جی ایس ٹی کے ساتھ", printPurchaseNote: "خریداری کا نوٹ پرنٹ کریں",
-            signature: "دستخط:", stamp: "مہر:", authorizedSignatory: "مجاز دستخط کنندہ"
+            signature: "دستخط:", stamp: "مہر:", authorizedSignatory: "مجاز دستخط کنندہ",
+            purchaseReportTitle: "خریداری کی رپورٹ", purchaseReportDesc: "تاریخ کی حد کے اندر تمام خریداریوں کی تفصیلی فہرست ڈاؤن لوڈ کریں۔", supplierAddressLabel: "سپلائر کا پتہ:",
+            purchaseId: "خریداری کی شناخت", totalPrice: "کل قیمت/یونٹ (₹):", lineTotal: "کل:", sellingPriceLabel: "فروخت کی قیمت (₹):", totalGst: "کل جی ایس ٹی:", purchaseBillNo: "خریداری بل نمبر:"
         }
     };
     
     // --- ग्लोबल वेरिएबल्स ---
-    let allRetailerData = {}, currentUserEmail = null, currentBillItems = [], billCounter = 1, selectedProductForBill = null, currentLanguage = 'hi', editingProductId = null, currentBillForModal = null, editingSupplierId = null, editingCustomerId = null, editingBillId = null, editingPurchaseId = null;
+    let allRetailerData = {}, currentUserEmail = null, currentBillItems = [], billCounter = 1, productForCalculator = null, currentLanguage = 'hi', editingProductId = null, currentBillForModal = null, editingSupplierId = null, editingCustomerId = null, editingBillId = null, editingPurchaseId = null, lastActiveTab = 'dashboard';
     let cropper, currentCropTarget;
     let salesPurchaseChart, profitLossChart;
     const app = {}; window.app = app;
@@ -721,7 +818,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const translation = translations[lang][key];
             if (translation) {
                 if (el.placeholder) { el.placeholder = translation; } 
-                else if (el.tagName === 'SPAN' || el.tagName === 'BUTTON' || el.tagName === 'H2' || el.tagName === 'H4' || el.tagName === 'H5' || el.tagName === 'P' || el.tagName === 'LABEL' || el.tagName === 'TH' || el.tagName === 'A') {
+                else if (el.tagName === 'SPAN' || el.tagName === 'BUTTON' || el.tagName === 'H2' || el.tagName === 'H4' || el.tagName === 'H5' || el.tagName === 'P' || el.tagName === 'LABEL' || el.tagName === 'TH' || el.tagName === 'A' || el.tagName === 'STRONG') {
                     el.innerText = translation;
                 }
             }
@@ -743,15 +840,33 @@ document.addEventListener('DOMContentLoaded', () => {
              document.getElementById('verifyEmailBtn').disabled = false;
         }
     };
+
+    const closeProfileSidebar = () => {
+        document.getElementById('profile-sidebar').classList.remove('open');
+        document.getElementById('sidebar-overlay').classList.add('hidden');
+        showTab(lastActiveTab);
+    };
+
     const showTab = (tabName) => {
+        if (tabName === 'profile') return;
+        document.getElementById('profile-sidebar').classList.remove('open');
+        document.getElementById('sidebar-overlay').classList.add('hidden');
+
         document.querySelectorAll('.tab-content, .tab-link').forEach(el => el.classList.remove('active'));
-        document.getElementById(`${tabName}-tab`).classList.add('active');
-        document.querySelector(`.tab-link[data-tab='${tabName}']`).classList.add('active');
+        
+        const tabContent = document.getElementById(`${tabName}-tab`);
+        const tabLink = document.querySelector(`.tab-link[data-tab='${tabName}']`);
+        
+        if(tabContent) tabContent.classList.add('active');
+        if(tabLink) tabLink.classList.add('active');
+        
+        lastActiveTab = tabName;
         
         if (tabName === 'dashboard') renderDashboard();
         if (tabName === 'reports') {
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('salesReportToDate').value = today;
+            document.getElementById('purchaseReportToDate').value = today;
         } else if (tabName === 'purchase') {
             renderPurchaseHistory(); 
         } else if (tabName === 'expenses') {
@@ -850,7 +965,6 @@ document.addEventListener('DOMContentLoaded', () => {
         renderProfile();
         renderCustomerTable();
         renderExpensesTable();
-        populateBillingDropdown();
         updateCurrentBillDisplay();
         renderDashboard();
         renderPurchaseHistory();
@@ -908,43 +1022,27 @@ document.addEventListener('DOMContentLoaded', () => {
             return `<tr>
                         <td>${item.name}</td>
                         <td>${item.type === 'product' ? (item.quantity + ' ' + item.unit) : '-'}</td>
-                        <td><input type="number" class="bill-item-price" value="${item.price.toFixed(2)}" data-item-id="${item.id}" style="width: 80px; padding: 5px; margin: 0;"></td>
+                        <td>₹${item.price.toFixed(2)}</td>
                         <td>₹${item.total.toFixed(2)}</td>
                     </tr>`; 
         }).join('');
-        document.getElementById('subTotalDisplay').innerText = subTotal.toFixed(2);
         calculateFinalTotal();
     };
 
     const calculateFinalTotal = () => {
-        let subTotal = currentBillItems.reduce((sum, item) => sum + item.total, 0);
-        document.getElementById('subTotalDisplay').innerText = subTotal.toFixed(2); 
+        const subTotal = currentBillItems.reduce((sum, item) => sum + (item.basePrice * item.quantity), 0);
+        const totalGst = currentBillItems.reduce((sum, item) => sum + (item.gstAmount * item.quantity), 0);
+        
+        document.getElementById('subTotalDisplay').innerText = subTotal.toFixed(2);
+        document.getElementById('totalGstDisplay').innerText = totalGst.toFixed(2);
+        
         const discountValue = parseFloat(document.getElementById('discountInput').value) || 0;
         const discountType = document.getElementById('discountType').value;
-        const gstPercent = parseFloat(document.getElementById('gstInput').value) || 0;
+        
         let discountAmount = (discountType === 'percent') ? (subTotal * discountValue) / 100 : discountValue;
-        const totalAfterDiscount = subTotal - discountAmount;
-        const gstAmount = (totalAfterDiscount * gstPercent) / 100;
-        const finalTotal = totalAfterDiscount + gstAmount;
+        
+        const finalTotal = subTotal + totalGst - discountAmount;
         document.getElementById('grandTotalDisplay').innerText = finalTotal.toFixed(2);
-    };
-    
-    const populateBillingDropdown = () => {
-        const searchResultsContainer = document.getElementById('searchResultsContainer');
-        searchResultsContainer.innerHTML = '';
-        const inventory = allRetailerData[currentUserEmail]?.inventory || [];
-        const stockText = translations[currentLanguage].inStock;
-        inventory.forEach(product => {
-            const itemDiv = document.createElement('div');
-            itemDiv.classList.add('search-item');
-            itemDiv.innerHTML = `${product.name} <small>(${stockText}: ${product.quantity} ${product.unit})</small>`;
-            itemDiv.addEventListener('click', () => {
-                document.getElementById('productSearchInput').value = product.name;
-                selectedProductForBill = product;
-                searchResultsContainer.classList.add('hidden');
-            });
-            searchResultsContainer.appendChild(itemDiv);
-        });
     };
 
     // --- प्रमाणीकरण और आरंभीकरण ---
@@ -1019,36 +1117,6 @@ document.addEventListener('DOMContentLoaded', () => {
         e.target.reset();
     };
 
-    const handleAddItemToBill = (e) => {
-        e.preventDefault();
-        const lang = translations[currentLanguage];
-        const itemType = document.querySelector('input[name="itemType"]:checked').value;
-
-        if (itemType === 'product') {
-            if (!selectedProductForBill) { alert(lang.selectProductFromList); return; }
-            const quantity = parseFloat(document.getElementById('itemQuantity').value);
-            if (quantity > selectedProductForBill.quantity) { alert(lang.stockUnavailable.replace('{quantity}', selectedProductForBill.quantity).replace('{unit}', selectedProductForBill.unit)); return; }
-            
-            const existingItem = currentBillItems.find(item => item.id === selectedProductForBill.id && item.type === 'product');
-            if (existingItem) { existingItem.quantity += quantity; existingItem.total = existingItem.quantity * existingItem.price; } 
-            else { currentBillItems.push({ ...selectedProductForBill, type:'product', quantity, total: selectedProductForBill.price * quantity }); }
-        } else { // Service
-            const description = document.getElementById('serviceDescriptionInput').value.trim();
-            const charge = parseFloat(document.getElementById('serviceChargeInput').value);
-            if(!description || isNaN(charge) || charge <= 0) { alert(lang.fillAllFields); return; }
-
-            currentBillItems.push({ id: Date.now(), type: 'service', name: description, price: charge, quantity: 1, total: charge, unit:'' });
-            document.getElementById('serviceDescriptionInput').value = '';
-            document.getElementById('serviceChargeInput').value = '';
-        }
-
-        updateCurrentBillDisplay();
-        document.getElementById('productSearchInput').value = '';
-        selectedProductForBill = null;
-        document.getElementById('itemQuantity').value = 1;
-    };
-
-
     app.editProduct = (productId) => {
         const product = allRetailerData[currentUserEmail].inventory.find(p => p.id === productId);
         if (product) {
@@ -1118,7 +1186,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     app.generateBillHTML = (bill, retailer, customer) => {
         const lang = translations[currentLanguage];
-        const gstValue = bill.subTotal - bill.discountAmount > 0 ? (100 * bill.gstAmount / (bill.subTotal - bill.discountAmount)).toFixed(2) : 0;
         return `<div id="bill-to-print" style="background-color: #fff; color: #000; padding: 15px; font-family:'Courier New', monospace; direction: ${document.documentElement.dir};">
             <div style="text-align:center;">
                 <img src="${retailer.shopDetails.logo || ''}" style="max-height:80px; margin-bottom: 5px;">
@@ -1135,17 +1202,18 @@ document.addEventListener('DOMContentLoaded', () => {
             <hr style="border:1px dashed #333; margin: 8px 0;">
             <div class="bill-customer-info" style="font-size: 12px;">
                 <p style="margin:2px 0;"><strong>${lang.customer}:</strong> ${customer.name}, ${customer.phone}</p>
+                 ${customer.gstin ? `<p style="margin:2px 0; font-size: 12px;"><strong>${lang.gstinBill}</strong> ${customer.gstin}</p>` : ''}
             </div>
             <hr style="border:1px dashed #333; margin: 8px 0;">
             <table style="width:100%; font-size:12px; border-collapse:collapse;">
-                <thead><tr><th style="text-align:left; padding: 2px;">${lang.productColumn}</th><th style="text-align:center; padding: 2px;">${lang.quantityColumn}</th><th style="text-align:right; padding: 2px;">${lang.rateColumn}</th><th style="text-align:right; padding: 2px;">${lang.totalColumn}</th></tr></thead>
-                <tbody>${bill.items.map(item => `<tr><td style="text-align:left; padding: 2px;">${item.name}</td><td style="text-align:center; padding: 2px;">${item.type === 'product' ? (item.quantity + ' ' + item.unit) : '-'}</td><td style="text-align:right; padding: 2px;">₹${item.price.toFixed(2)}</td><td style="text-align:right; padding: 2px;">₹${item.total.toFixed(2)}</td></tr>`).join('')}</tbody>
+                <thead><tr><th style="text-align:left; padding: 2px;">${lang.productColumn}</th><th style="text-align:center; padding: 2px;">${lang.quantityColumn}</th><th style="text-align:right; padding: 2px;">${lang.rateColumn}</th><th style="text-align:center; padding: 2px;">${lang.gst}</th><th style="text-align:right; padding: 2px;">${lang.totalColumn}</th></tr></thead>
+                <tbody>${bill.items.map(item => `<tr><td style="text-align:left; padding: 2px;">${item.name}</td><td style="text-align:center; padding: 2px;">${item.type === 'product' ? (item.quantity + ' ' + item.unit) : '-'}</td><td style="text-align:right; padding: 2px;">₹${item.price.toFixed(2)}</td><td style="text-align:center; padding: 2px;">${item.gstPercent ? item.gstPercent.toFixed(2) + '%' : '-'}</td><td style="text-align:right; padding: 2px;">₹${item.total.toFixed(2)}</td></tr>`).join('')}</tbody>
             </table>
             <hr style="border:1px dashed #333; margin: 8px 0;">
             <div style="font-size: 13px;">
                 <div style="display:flex; justify-content:space-between;"><span>${lang.subTotalBill}</span><span>₹${bill.subTotal.toFixed(2)}</span></div>
+                 <div style="display:flex; justify-content:space-between;"><span>${lang.totalGst}</span><span>+ ₹${bill.totalGst.toFixed(2)}</span></div>
                 <div style="display:flex; justify-content:space-between;"><span>${lang.discountBill}</span><span>- ₹${bill.discountAmount.toFixed(2)}</span></div>
-                <div style="display:flex; justify-content:space-between;"><span>GST (${gstValue}%):</span><span>+ ₹${bill.gstAmount.toFixed(2)}</span></div>
                 <hr style="border-top:1px solid #333; margin: 5px 0;">
                 <div style="display:flex; justify-content:space-between; font-weight:bold; font-size: 15px;"><span>${lang.grandTotalBill}</span><span>₹${bill.total.toFixed(2)}</span></div>
             </div>
@@ -1167,7 +1235,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const retailer = allRetailerData[currentUserEmail];
         let customer = retailer.customers.find(c => c.phone === phone);
         if (customer) { Object.assign(customer, { name, address }); } 
-        else { customer = { id: Date.now(), name, phone, address }; retailer.customers.push(customer); }
+        else { customer = { id: Date.now(), name, phone, address, gstin: '' }; retailer.customers.push(customer); }
         return customer;
     };
     
@@ -1178,14 +1246,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const customerPhone = document.getElementById('billingCustomerPhone').value.trim();
         if (!customerPhone || !customerName) { alert(translations[currentLanguage].customerInfoRequired); return; }
         
-        let subTotal = currentBillItems.reduce((sum, item) => sum + item.total, 0);
+        const subTotal = currentBillItems.reduce((sum, item) => sum + (item.basePrice * item.quantity), 0);
+        const totalGst = currentBillItems.reduce((sum, item) => sum + (item.gstAmount * item.quantity), 0);
         const discountValue = parseFloat(document.getElementById('discountInput').value) || 0;
         const discountType = document.getElementById('discountType').value;
-        const gstPercent = parseFloat(document.getElementById('gstInput').value) || 0;
-        let discountAmount = (discountType === 'percent') ? (subTotal * discountValue) / 100 : discountValue;
-        const totalAfterDiscount = subTotal - discountAmount;
-        const gstAmount = (totalAfterDiscount * gstPercent) / 100;
-        const finalTotal = totalAfterDiscount + gstAmount;
+        const discountAmount = (discountType === 'percent') ? (subTotal * discountValue) / 100 : discountValue;
+        const finalTotal = subTotal + totalGst - discountAmount;
 
         if (editingBillId) { // Update existing bill
             const billToUpdate = retailer.bills.find(b => b.billNo === editingBillId);
@@ -1200,8 +1266,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 billToUpdate.items = JSON.parse(JSON.stringify(currentBillItems));
                 billToUpdate.subTotal = subTotal;
+                billToUpdate.totalGst = totalGst;
                 billToUpdate.discountAmount = discountAmount;
-                billToUpdate.gstAmount = gstAmount;
                 billToUpdate.total = finalTotal;
             }
              document.getElementById('generateBillBtn').innerText = translations[currentLanguage].generateBill;
@@ -1213,7 +1279,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const billId = `${today.getFullYear()}${pad(today.getMonth() + 1)}${pad(today.getDate())}${pad(today.getHours())}${pad(today.getMinutes())}${pad(today.getSeconds())}-${billCounter++}`;
             const billDate = `${pad(today.getDate())}-${pad(today.getMonth() + 1)}-${today.getFullYear()}`;
             const billTime = `${pad(today.getHours())}:${pad(today.getMinutes())}`;
-            const newBill = { billNo: billId, customerId: customerForBill.id, date: billDate, time: billTime, items: JSON.parse(JSON.stringify(currentBillItems)), subTotal, discountAmount, gstAmount, total: finalTotal };
+            const newBill = { billNo: billId, customerId: customerForBill.id, date: billDate, time: billTime, items: JSON.parse(JSON.stringify(currentBillItems)), subTotal, totalGst, discountAmount, total: finalTotal };
             retailer.bills.push(newBill);
             currentBillForModal = newBill;
             document.getElementById('bill-to-print-container').innerHTML = app.generateBillHTML(newBill, retailer, customerForBill);
@@ -1238,14 +1304,18 @@ document.addEventListener('DOMContentLoaded', () => {
         currentBillItems = [];
         editingBillId = null;
         document.getElementById('customerDetailsForm').reset();
-        document.getElementById('addItemForm').reset();
         document.querySelector('input[name="itemType"][value="product"]').checked = true;
         document.getElementById('product-fields').classList.remove('hidden');
         document.getElementById('service-fields').classList.add('hidden');
         document.getElementById('discountInput').value = 0;
-        document.getElementById('gstInput').value = 0;
         document.getElementById('generateBillBtn').innerText = translations[currentLanguage].generateBill;
         updateCurrentBillDisplay();
+        resetItemCalculator();
+        document.getElementById('serviceDescriptionInput').value = '';
+        document.getElementById('serviceChargeInput').value = '';
+        document.querySelector('input[name="serviceGstType"][value="without_gst"]').checked = true;
+        document.getElementById('serviceGstPercent').value = 0;
+        document.getElementById('service-gst-field-container').classList.add('hidden');
     };
 
 
@@ -1269,15 +1339,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         editingBillId = billNo;
         
-        // Populate customer details
         document.getElementById('billingCustomerName').value = customer.name;
         document.getElementById('billingCustomerPhone').value = customer.phone;
         document.getElementById('billingCustomerAddress').value = customer.address || '';
         
-        // Populate items
         currentBillItems = JSON.parse(JSON.stringify(bill.items));
         
-        // Populate summary
         const subTotal = bill.subTotal;
         const discountAmount = bill.discountAmount;
         if(bill.discountType === 'percent') {
@@ -1287,7 +1354,6 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('discountType').value = 'fixed';
             document.getElementById('discountInput').value = discountAmount;
         }
-        document.getElementById('gstInput').value = (subTotal - discountAmount) > 0 ? ((bill.gstAmount * 100) / (subTotal - discountAmount)).toFixed(2) : 0;
 
         updateCurrentBillDisplay();
         document.getElementById('generateBillBtn').innerText = translations[currentLanguage].updateBtn;
@@ -1388,13 +1454,14 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- आपूर्तिकर्ता फंक्शन ---
-    const getOrCreateSupplier = (name, phone) => {
+    const getOrCreateSupplier = (name, phone, address) => {
         const retailer = allRetailerData[currentUserEmail];
         let supplier = retailer.suppliers.find(s => s.phone === phone);
         if (supplier) {
             if (supplier.name !== name) { supplier.name = name; } 
+            if (address) { supplier.address = address; }
         } else {
-            supplier = { id: Date.now(), name, phone, address: '' }; 
+            supplier = { id: Date.now(), name, phone, address: address || '', gstin: '' }; 
             if (!Array.isArray(retailer.suppliers)) retailer.suppliers = [];
             retailer.suppliers.push(supplier);
         }
@@ -1407,12 +1474,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const name = document.getElementById('supplierName').value.trim();
         const phone = document.getElementById('supplierPhone').value.trim();
         const address = document.getElementById('supplierAddress').value.trim();
+        const gstin = document.getElementById('supplierGstin').value.trim();
         const lang = translations[currentLanguage];
         if (!name || !phone) { alert(lang.fillAllFields); return; }
 
         if (editingSupplierId) {
             const supplier = retailerData.suppliers.find(s => s.id === editingSupplierId);
-            if(supplier) Object.assign(supplier, { name, phone, address });
+            if(supplier) Object.assign(supplier, { name, phone, address, gstin });
             document.getElementById('supplierSubmitBtn').innerText = lang.addSupplierBtn;
             editingSupplierId = null;
         } else {
@@ -1421,7 +1489,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert("इस फ़ोन नंबर वाला आपूर्तिकर्ता पहले से मौजूद है।");
                 return;
             }
-            retailerData.suppliers.push({ id: Date.now(), name, phone, address });
+            retailerData.suppliers.push({ id: Date.now(), name, phone, address, gstin });
         }
         saveData();
         renderSupplierTable();
@@ -1435,6 +1503,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('supplierName').value = supplier.name;
             document.getElementById('supplierPhone').value = supplier.phone;
             document.getElementById('supplierAddress').value = supplier.address || '';
+            document.getElementById('supplierGstin').value = supplier.gstin || '';
             document.getElementById('supplierSubmitBtn').innerText = translations[currentLanguage].updateBtn;
             showTab('suppliers');
         }
@@ -1456,12 +1525,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const name = document.getElementById('addCustomerName').value.trim();
         const phone = document.getElementById('addCustomerPhone').value.trim();
         const address = document.getElementById('addCustomerAddress').value.trim();
+        const gstin = document.getElementById('addCustomerGstin').value.trim();
         const lang = translations[currentLanguage];
         if (!name || !phone) { alert(lang.fillAllFields); return; }
 
         if (editingCustomerId) {
             const customer = retailerData.customers.find(c => c.id === editingCustomerId);
-            if (customer) { Object.assign(customer, { name, phone, address }); }
+            if (customer) { Object.assign(customer, { name, phone, address, gstin }); }
             document.getElementById('customerSubmitBtn').innerText = lang.addCustomerBtn;
             editingCustomerId = null;
         } else {
@@ -1470,7 +1540,7 @@ document.addEventListener('DOMContentLoaded', () => {
                  alert("इस फ़ोन नंबर वाला ग्राहक पहले से मौजूद है।");
                  return;
             }
-            retailerData.customers.push({ id: Date.now(), name, phone, address });
+            retailerData.customers.push({ id: Date.now(), name, phone, address, gstin });
             alert(lang.customerAddedSuccess);
         }
         saveData();
@@ -1485,6 +1555,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('addCustomerName').value = customer.name;
             document.getElementById('addCustomerPhone').value = customer.phone;
             document.getElementById('addCustomerAddress').value = customer.address || '';
+            document.getElementById('addCustomerGstin').value = customer.gstin || '';
             document.getElementById('customerSubmitBtn').innerText = translations[currentLanguage].updateBtn;
             showTab('customers');
         }
@@ -1515,6 +1586,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return `
             <div class="history-item">
                 <p><strong>${lang.supplierName}</strong> ${supplier ? supplier.name : 'N/A'} | <strong>${lang.purchaseDate}:</strong> ${new Date(entry.date).toLocaleDateString()}</p>
+                <p><strong>${lang.purchaseBillNo}:</strong> ${entry.purchaseBillNo || 'N/A'}</p>
                 <p><strong>${lang.purchaseItems}:</strong> ${entry.item.name} (${entry.item.quantity} ${entry.item.unit}) @ ₹${totalCost.toFixed(2)}</p>
             </div>
         `}).join('');
@@ -1534,10 +1606,11 @@ document.addEventListener('DOMContentLoaded', () => {
             container.innerHTML = entries.map(entry => `
                 <div class="history-item">
                     <p><strong>${lang.purchaseDate}:</strong> ${new Date(entry.date).toLocaleString()}</p>
+                    ${entry.purchaseBillNo ? `<p><strong>${lang.purchaseBillNo}:</strong> ${entry.purchaseBillNo}</p>` : ''}
                     <p><strong>${lang.purchaseItems}:</strong> ${entry.item.name} (${entry.item.quantity} ${entry.item.unit})</p>
                     <p><strong>Total Cost:</strong> ₹${(entry.item.totalPrice * entry.item.quantity).toFixed(2)}</p>
                      <div class="history-item-actions">
-                        <button onclick="app.printPurchaseNote(${entry.id})" class="action-button print">${lang.printPurchaseNote}</button>
+                        <button onclick="app.showPurchaseSlipPreview(${entry.id})" class="action-button print">${lang.printPurchaseNote}</button>
                         <button onclick="app.editPurchase(${entry.id})" class="action-button edit">${lang.editBtn}</button>
                     </div>
                 </div>
@@ -1554,19 +1627,22 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const supplierName = document.getElementById('purchaseSupplierName').value.trim();
         const supplierPhone = document.getElementById('purchaseSupplierPhone').value.trim();
+        const supplierAddress = document.getElementById('purchaseSupplierAddress').value.trim();
+        const purchaseBillNo = document.getElementById('purchaseBillNo').value.trim();
         const productName = document.getElementById('purchaseProductName').value.trim();
-        const basePrice = parseFloat(document.getElementById('purchaseBasePrice').value);
+        const purchasePrice = parseFloat(document.getElementById('purchaseBasePrice').value);
+        const sellingPrice = parseFloat(document.getElementById('purchaseSellingPrice').value);
         const quantity = parseFloat(document.getElementById('purchaseQuantity').value);
         const unit = document.getElementById('purchaseUnit').value;
         const gstType = document.querySelector('input[name="gstType"]:checked').value;
         const gstPercent = (gstType === 'with_gst') ? parseFloat(document.getElementById('purchaseGstPercent').value) || 0 : 0;
         
-        if (!supplierName || !supplierPhone || !productName || isNaN(basePrice) || basePrice <= 0 || isNaN(quantity) || quantity <= 0) {
+        if (!supplierName || !supplierPhone || !productName || isNaN(purchasePrice) || purchasePrice <= 0 || isNaN(sellingPrice) || sellingPrice <= 0 || isNaN(quantity) || quantity <= 0) {
             alert(lang.fillAllFields); return;
         }
         
-        const gstAmount = basePrice * (gstPercent / 100);
-        const totalPricePerItem = basePrice + gstAmount;
+        const gstAmount = purchasePrice * (gstPercent / 100);
+        const totalPricePerItem = purchasePrice + gstAmount;
 
         if(editingPurchaseId) {
              const purchaseToUpdate = retailerData.purchaseEntries.find(p => p.id === editingPurchaseId);
@@ -1575,15 +1651,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 const oldInventoryItem = retailerData.inventory.find(item => item.name.toLowerCase() === purchaseToUpdate.item.name.toLowerCase());
                 if(oldInventoryItem) oldInventoryItem.quantity -= purchaseToUpdate.item.quantity;
 
-                Object.assign(purchaseToUpdate.item, { name: productName, basePrice, gstPercent, totalPrice: totalPricePerItem, quantity, unit });
+                Object.assign(purchaseToUpdate, {
+                    purchaseBillNo,
+                    item: { name: productName, basePrice: purchasePrice, sellingPrice: sellingPrice, gstPercent, totalPrice: totalPricePerItem, quantity, unit }
+                });
              }
              editingPurchaseId = null;
         } else {
-            const supplier = getOrCreateSupplier(supplierName, supplierPhone);
+            const supplier = getOrCreateSupplier(supplierName, supplierPhone, supplierAddress);
             if (!Array.isArray(retailerData.purchaseEntries)) retailerData.purchaseEntries = [];
             retailerData.purchaseEntries.push({
-                id: Date.now(), supplierId: supplier.id, date: new Date().toISOString(),
-                item: { name: productName, basePrice, gstPercent, totalPrice: totalPricePerItem, quantity, unit }
+                id: Date.now(),
+                supplierId: supplier.id,
+                date: new Date().toISOString(),
+                purchaseBillNo: purchaseBillNo,
+                item: { name: productName, basePrice: purchasePrice, sellingPrice: sellingPrice, gstPercent, totalPrice: totalPricePerItem, quantity, unit }
             });
         }
         
@@ -1591,8 +1673,9 @@ document.addEventListener('DOMContentLoaded', () => {
         let inventoryItem = retailerData.inventory.find(item => item.name.toLowerCase() === productName.toLowerCase());
         if (inventoryItem) {
             inventoryItem.quantity += quantity;
+            inventoryItem.price = sellingPrice; // Update selling price on new purchase
         } else {
-            retailerData.inventory.push({ id: Date.now(), name: productName, price: totalPricePerItem * 1.2, quantity, unit }); // Assume 20% markup
+            retailerData.inventory.push({ id: Date.now(), name: productName, price: sellingPrice, quantity, unit });
         }
 
         saveData();
@@ -1608,13 +1691,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         editingPurchaseId = purchaseId;
 
-        // Populate supplier
         document.getElementById('purchaseSupplierName').value = supplier.name;
         document.getElementById('purchaseSupplierPhone').value = supplier.phone;
+        document.getElementById('purchaseSupplierAddress').value = supplier.address || '';
+        document.getElementById('purchaseBillNo').value = purchase.purchaseBillNo || '';
         
-        // Populate item details
         document.getElementById('purchaseProductName').value = purchase.item.name;
         document.getElementById('purchaseBasePrice').value = purchase.item.basePrice;
+        document.getElementById('purchaseSellingPrice').value = purchase.item.sellingPrice;
         document.getElementById('purchaseQuantity').value = purchase.item.quantity;
         document.getElementById('purchaseUnit').value = purchase.item.unit;
         
@@ -1632,10 +1716,63 @@ document.addEventListener('DOMContentLoaded', () => {
         showTab('purchase');
     };
     
-    app.printPurchaseNote = (purchaseId) => {
-        // This function will generate an HTML for the purchase note and open the print dialog
-        alert('Printing purchase note... (Feature in development)');
+    const generatePurchaseSlipHTML = (purchaseEntry) => {
+        const retailer = allRetailerData[currentUserEmail];
+        const supplier = retailer.suppliers.find(s => s.id === purchaseEntry.supplierId);
+        const item = purchaseEntry.item;
+        const totalCost = item.totalPrice * item.quantity;
+        const lang = translations[currentLanguage];
+
+        return `<div style="background-color: #fff; color: #000; padding: 15px; font-family:'Courier New', monospace;">
+            <div style="text-align:center;">
+                <h3 style="margin:5px 0; font-weight:bold;">${lang.purchaseReportTitle}</h3>
+                <p style="margin:2px 0; font-size: 12px;">${retailer.shopDetails.name}</p>
+                 <hr style="border:1px dashed #333; margin: 8px 0;">
+            </div>
+            <p><strong>${lang.purchaseId}:</strong> ${purchaseEntry.id}</p>
+            ${purchaseEntry.purchaseBillNo ? `<p><strong>${lang.purchaseBillNo}:</strong> ${purchaseEntry.purchaseBillNo}</p>`:''}
+            <p><strong>${lang.purchaseDate}:</strong> ${new Date(purchaseEntry.date).toLocaleString()}</p>
+            <hr style="border:1px dashed #333; margin: 8px 0;">
+            <h4>${lang.supplierDetails}</h4>
+            <p><strong>${lang.name}:</strong> ${supplier.name}</p>
+            <p><strong>${lang.phoneColumn}:</strong> ${supplier.phone}</p>
+            <p><strong>${lang.address}:</strong> ${supplier.address || 'N/A'}</p>
+            ${supplier.gstin ? `<p><strong>${lang.gstinLabel}:</strong> ${supplier.gstin}</p>`:''}
+            <hr style="border:1px dashed #333; margin: 8px 0;">
+            <h4>${lang.purchaseItems}</h4>
+            <table style="width:100%; font-size:12px; border-collapse:collapse;">
+                 <thead><tr><th style="text-align:left;">${lang.productColumn}</th><th style="text-align:center;">${lang.quantity}</th><th style="text-align:right;">${lang.purchasePrice}</th><th style="text-align:right;">${lang.total}</th></tr></thead>
+                 <tbody>
+                    <tr>
+                        <td>${item.name}</td>
+                        <td style="text-align:center;">${item.quantity} ${item.unit}</td>
+                        <td style="text-align:right;">₹${item.totalPrice.toFixed(2)}</td>
+                        <td style="text-align:right;">₹${totalCost.toFixed(2)}</td>
+                    </tr>
+                 </tbody>
+            </table>
+            <hr style="border:1px dashed #333; margin: 8px 0;">
+            <div style="text-align:right; font-weight:bold; font-size: 15px;">
+                <span>${lang.grandTotal}:</span><span>₹${totalCost.toFixed(2)}</span>
+            </div>
+        </div>`;
     };
+    
+    app.showPurchaseSlipPreview = (purchaseId) => {
+        const purchase = allRetailerData[currentUserEmail].purchaseEntries.find(p => p.id === purchaseId);
+        if(!purchase) return;
+        
+        const modal = document.getElementById('print-preview-modal');
+        const contentDiv = document.getElementById('print-preview-content');
+        contentDiv.innerHTML = generatePurchaseSlipHTML(purchase);
+        
+        document.querySelector('input[name="paper-size"][value="a4"]').checked = true;
+        contentDiv.className = 'preview-a4';
+        
+        document.getElementById('history-modal').style.display = 'none';
+        modal.style.display = 'block';
+    };
+
 
     // --- खर्च फंक्शन ---
     const renderExpensesTable = () => {
@@ -1687,6 +1824,127 @@ document.addEventListener('DOMContentLoaded', () => {
             renderDashboard();
         }
     };
+    
+    // --- सेल टैब कैलकुलेटर ---
+    const showItemCalculator = (product) => {
+        productForCalculator = product;
+        const calculator = document.getElementById('item-details-calculator');
+        document.getElementById('calculatorProductName').innerText = product.name;
+        document.getElementById('calcQuantity').value = 1;
+        document.getElementById('calcUnit').value = product.unit;
+        document.getElementById('calcGstPercent').value = 0;
+        document.getElementById('calcTotalPrice').value = product.price.toFixed(2);
+        
+        calculateItemPrice('total');
+        
+        calculator.classList.remove('hidden');
+    };
+    
+    const calculateItemPrice = (source) => {
+        if (!productForCalculator) return;
+        const qty = parseFloat(document.getElementById('calcQuantity').value) || 1;
+        let basePrice = parseFloat(document.getElementById('calcBasePrice').value) || 0;
+        let gstPercent = parseFloat(document.getElementById('calcGstPercent').value) || 0;
+        let totalPrice = parseFloat(document.getElementById('calcTotalPrice').value) || 0;
+
+        if (source === 'base' || source === 'gst') {
+            totalPrice = basePrice * (1 + (gstPercent / 100));
+            document.getElementById('calcTotalPrice').value = totalPrice.toFixed(2);
+        } else if (source === 'total') {
+            basePrice = totalPrice / (1 + (gstPercent / 100));
+            document.getElementById('calcBasePrice').value = basePrice.toFixed(2);
+        }
+        
+        const lineTotal = qty * totalPrice;
+        document.getElementById('calcLineTotal').innerText = lineTotal.toFixed(2);
+    };
+
+    const handleAddItemToBillFromCalculator = () => {
+        const lang = translations[currentLanguage];
+        const quantity = parseFloat(document.getElementById('calcQuantity').value);
+        if (!productForCalculator || isNaN(quantity) || quantity <= 0) {
+            alert(lang.fillAllFields);
+            return;
+        }
+        if (quantity > productForCalculator.quantity) {
+             alert(lang.stockUnavailable.replace('{quantity}', productForCalculator.quantity).replace('{unit}', productForCalculator.unit));
+             return;
+        }
+
+        const basePrice = parseFloat(document.getElementById('calcBasePrice').value);
+        const gstPercent = parseFloat(document.getElementById('calcGstPercent').value);
+        const totalPricePerUnit = parseFloat(document.getElementById('calcTotalPrice').value);
+        const lineTotal = parseFloat(document.getElementById('calcLineTotal').innerText);
+        const gstAmountPerUnit = totalPricePerUnit - basePrice;
+        
+        const existingItem = currentBillItems.find(item => item.id === productForCalculator.id && item.type === 'product');
+        if (existingItem) {
+            alert("This item is already in the bill. Please remove it first to add with new values.");
+        } else {
+             currentBillItems.push({
+                ...productForCalculator, type: 'product',
+                quantity: quantity,
+                basePrice: basePrice,
+                gstPercent: gstPercent,
+                gstAmount: gstAmountPerUnit,
+                price: totalPricePerUnit,
+                total: lineTotal
+            });
+        }
+       
+        updateCurrentBillDisplay();
+        resetItemCalculator();
+        document.getElementById('productSearchInput').value = '';
+    };
+    
+    const handleAddServiceToBill = () => {
+        const lang = translations[currentLanguage];
+        const description = document.getElementById('serviceDescriptionInput').value.trim();
+        const totalPrice = parseFloat(document.getElementById('serviceChargeInput').value);
+        const gstType = document.querySelector('input[name="serviceGstType"]:checked').value;
+        const gstPercent = (gstType === 'with_gst') ? parseFloat(document.getElementById('serviceGstPercent').value) || 0 : 0;
+
+        if (!description || isNaN(totalPrice) || totalPrice <= 0) {
+            alert(lang.fillAllFields);
+            return;
+        }
+
+        let basePrice, gstAmount;
+
+        if (gstPercent > 0) {
+            basePrice = totalPrice / (1 + (gstPercent / 100));
+            gstAmount = totalPrice - basePrice;
+        } else {
+            basePrice = totalPrice;
+            gstAmount = 0;
+        }
+
+        currentBillItems.push({
+            id: Date.now(),
+            type: 'service',
+            name: description,
+            basePrice: basePrice,
+            gstAmount: gstAmount,
+            gstPercent: gstPercent,
+            price: totalPrice, // price per unit (total price for service)
+            quantity: 1,
+            total: totalPrice, // line total (also total price for service)
+            unit: ''
+        });
+
+        updateCurrentBillDisplay();
+        // Reset service fields
+        document.getElementById('serviceDescriptionInput').value = '';
+        document.getElementById('serviceChargeInput').value = '';
+        document.querySelector('input[name="serviceGstType"][value="without_gst"]').checked = true;
+        document.getElementById('serviceGstPercent').value = 0;
+        document.getElementById('service-gst-field-container').classList.add('hidden');
+    };
+
+    const resetItemCalculator = () => {
+        document.getElementById('item-details-calculator').classList.add('hidden');
+        productForCalculator = null;
+    };
 
 
     const attachAllEventListeners = () => {
@@ -1695,14 +1953,33 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('loginBackBtn').addEventListener('click', () => showPage('welcome-page'));
         document.getElementById('signupBackBtn').addEventListener('click', () => showPage('welcome-page'));
         document.getElementById('logoutBtn').addEventListener('click', logout);
-        document.getElementById('appTabsContainer').addEventListener('click', (e) => { if (e.target.matches('.tab-link')) showTab(e.target.dataset.tab); });
+        
+        document.getElementById('appTabsContainer').addEventListener('click', (e) => {
+            if (e.target.matches('.tab-link')) {
+                const tabName = e.target.dataset.tab;
+                if (tabName === 'profile') {
+                    document.querySelectorAll('.tab-link').forEach(el => el.classList.remove('active'));
+                    e.target.classList.add('active');
+                    document.getElementById('profile-sidebar').classList.add('open');
+                    document.getElementById('sidebar-overlay').classList.remove('hidden');
+                } else if (tabName) {
+                    showTab(tabName);
+                }
+            }
+        });
+
+        document.getElementById('closeProfileSidebarBtn').addEventListener('click', closeProfileSidebar);
+        document.getElementById('sidebar-overlay').addEventListener('click', closeProfileSidebar);
         
         document.getElementById('language-select').addEventListener('change', (e) => setLanguage(e.target.value));
 
         document.getElementById('loginForm').addEventListener('submit', handleLogin);
         document.getElementById('signupForm').addEventListener('submit', handleSignup);
         document.getElementById('stockForm').addEventListener('submit', handleAddStock);
-        document.getElementById('addItemForm').addEventListener('submit', handleAddItemToBill);
+        
+        document.getElementById('addItemToBillBtn').addEventListener('click', handleAddItemToBillFromCalculator);
+        document.getElementById('addServiceToBillBtn').addEventListener('click', handleAddServiceToBill);
+
         document.getElementById('printStockBtn').addEventListener('click', handlePrintStock);
         document.getElementById('saveStockPdfBtn').addEventListener('click', handleSaveStockPdf);
         document.getElementById('saveProfileBtn').addEventListener('click', handleSaveProfile);
@@ -1734,6 +2011,18 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
+        document.querySelectorAll('input[name="serviceGstType"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                const gstField = document.getElementById('service-gst-field-container');
+                if (e.target.value === 'with_gst') {
+                    gstField.classList.remove('hidden');
+                } else {
+                    gstField.classList.add('hidden');
+                    document.getElementById('serviceGstPercent').value = 0;
+                }
+            });
+        });
+
         document.querySelectorAll('input[name="itemType"]').forEach(radio => {
             radio.addEventListener('change', (e) => {
                 const productFields = document.getElementById('product-fields');
@@ -1744,38 +2033,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     productFields.classList.add('hidden');
                     serviceFields.classList.remove('hidden');
+                    resetItemCalculator();
                 }
             });
         });
+        
+        ['calcQuantity', 'calcGstPercent'].forEach(id => document.getElementById(id).addEventListener('input', () => calculateItemPrice('gst')));
+        document.getElementById('calcBasePrice').addEventListener('input', () => calculateItemPrice('base'));
+        document.getElementById('calcTotalPrice').addEventListener('input', () => calculateItemPrice('total'));
 
         
-        document.getElementById('currentBillBody').addEventListener('input', (e) => {
-            if (e.target.classList.contains('bill-item-price')) {
-                const itemId = parseInt(e.target.dataset.itemId);
-                const newPrice = parseFloat(e.target.value);
-                const itemInBill = currentBillItems.find(item => item.id === itemId);
-
-                if (itemInBill && !isNaN(newPrice) && newPrice >= 0) {
-                    itemInBill.price = newPrice;
-                    itemInBill.total = itemInBill.quantity * newPrice;
-                    e.target.closest('tr').querySelector('td:last-child').innerText = `₹${itemInBill.total.toFixed(2)}`;
-                    calculateFinalTotal();
-                }
-            }
-        });
-        
-        ['discountInput', 'discountType', 'gstInput'].forEach(id => {
+        ['discountInput', 'discountType'].forEach(id => {
             document.getElementById(id).addEventListener('input', calculateFinalTotal);
         });
 
 
         document.getElementById('downloadSalesPdfBtn').addEventListener('click', () => generateSalesReport('pdf'));
         document.getElementById('downloadSalesCsvBtn').addEventListener('click', () => generateSalesReport('csv'));
+        document.getElementById('downloadPurchasePdfBtn').addEventListener('click', () => generatePurchaseReport('pdf'));
+        document.getElementById('downloadPurchaseCsvBtn').addEventListener('click', () => generatePurchaseReport('csv'));
         document.getElementById('downloadStockReportPdfBtn').addEventListener('click', generateStockReportPdf);
         document.getElementById('downloadStockReportCsvBtn').addEventListener('click', generateStockReportCsv);
         document.getElementById('downloadCustomersPdfBtn').addEventListener('click', generateCustomerReportPdf);
         document.getElementById('downloadCustomersCsvBtn').addEventListener('click', generateCustomerReportCsv);
         
+        // --- ग्राहक खोज ---
         const customerSearchInput = document.getElementById('billingCustomerName');
         const customerSearchResultsContainer = document.getElementById('customerSearchResultsContainer');
         customerSearchInput.addEventListener('input', () => {
@@ -1795,12 +2077,19 @@ document.addEventListener('DOMContentLoaded', () => {
             } else { customerSearchResultsContainer.classList.add('hidden'); }
         });
 
+        // --- उत्पाद खोज ---
         const searchInput = document.getElementById('productSearchInput');
         const searchResultsContainer = document.getElementById('searchResultsContainer');
         searchInput.addEventListener('input', () => {
+            if (productForCalculator) {
+                resetItemCalculator();
+            }
             const searchTerm = searchInput.value.toLowerCase();
-            selectedProductForBill = null; searchResultsContainer.innerHTML = '';
-            if (searchTerm.length === 0) { searchResultsContainer.classList.add('hidden'); return; }
+            searchResultsContainer.innerHTML = '';
+            if (searchTerm.length === 0) { 
+                searchResultsContainer.classList.add('hidden'); 
+                return; 
+            }
             const matches = (allRetailerData[currentUserEmail]?.inventory || []).filter(p => p.name.toLowerCase().includes(searchTerm) && p.quantity > 0);
             if (matches.length > 0) {
                 const stockText = translations[currentLanguage].inStock;
@@ -1808,14 +2097,52 @@ document.addEventListener('DOMContentLoaded', () => {
                     const itemDiv = document.createElement('div');
                     itemDiv.className = 'search-item';
                     itemDiv.innerHTML = `${product.name} <small>(${stockText}: ${product.quantity} ${product.unit})</small>`;
-                    itemDiv.onclick = () => { searchInput.value = product.name; selectedProductForBill = product; searchResultsContainer.classList.add('hidden'); };
+                    itemDiv.onclick = () => { 
+                        searchInput.value = product.name; 
+                        searchResultsContainer.classList.add('hidden'); 
+                        showItemCalculator(product);
+                    };
                     searchResultsContainer.appendChild(itemDiv);
                 });
                 searchResultsContainer.classList.remove('hidden');
+            } else {
+                searchResultsContainer.classList.add('hidden');
             }
         });
+        
+        // --- आपूर्तिकर्ता खोज ---
+        const supplierSearchInput = document.getElementById('purchaseSupplierName');
+        const supplierSearchResultsContainer = document.getElementById('supplierPurchaseSearchResultsContainer');
+        supplierSearchInput.addEventListener('input', () => {
+             const searchTerm = supplierSearchInput.value.toLowerCase().trim();
+             supplierSearchResultsContainer.innerHTML = '';
+             if (searchTerm.length === 0) { supplierSearchResultsContainer.classList.add('hidden'); return; }
+             const matches = (allRetailerData[currentUserEmail]?.suppliers || []).filter(s => s.name.toLowerCase().includes(searchTerm) || s.phone.includes(searchTerm));
+             if(matches.length > 0) {
+                 matches.forEach(supplier => {
+                     const itemDiv = document.createElement('div');
+                     itemDiv.className = 'search-item';
+                     itemDiv.textContent = `${supplier.name} - ${supplier.phone}`;
+                     itemDiv.onclick = () => {
+                         document.getElementById('purchaseSupplierName').value = supplier.name;
+                         document.getElementById('purchaseSupplierPhone').value = supplier.phone;
+                         document.getElementById('purchaseSupplierAddress').value = supplier.address || '';
+                         supplierSearchResultsContainer.classList.add('hidden');
+                     };
+                     supplierSearchResultsContainer.appendChild(itemDiv);
+                 });
+                 supplierSearchResultsContainer.classList.remove('hidden');
+             } else {
+                 supplierSearchResultsContainer.classList.add('hidden');
+             }
+        });
 
-        document.addEventListener('click', (e) => { if (!e.target.closest('.search-container')) { searchResultsContainer.classList.add('hidden'); customerSearchResultsContainer.classList.add('hidden'); } });
+
+        document.addEventListener('click', (e) => { 
+            if (!e.target.closest('.search-container')) { 
+                document.querySelectorAll('.search-results').forEach(el => el.classList.add('hidden'));
+            } 
+        });
         
         document.getElementById('closeBillModalBtn').addEventListener('click', (e) => {
             document.getElementById('bill-modal').style.display = 'none';
@@ -1836,8 +2163,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const retailer = allRetailerData[currentUserEmail];
             const customer = retailer.customers.find(c => c.id == bill.customerId);
             if (!retailer || !customer) { alert(lang.noBillToShare); return; }
-            const gstValue = bill.subTotal - bill.discountAmount > 0 ? (100 * bill.gstAmount / (bill.subTotal - bill.discountAmount)).toFixed(2) : 0;
-            const message = `*${retailer.shopDetails.name}*\n\n*${lang.customer}:* ${customer.name}\n*${lang.mobile}:* ${customer.phone}\n\n*${lang.billNo}:* ${bill.billNo}\n*${lang.date}:* ${bill.date} ${bill.time}\n----------------------------------\n${bill.items.map(item => `${item.name} (${item.type === 'product' ? item.quantity + ' ' + item.unit : ''}) - ₹${item.total.toFixed(2)}`).join('\n')}\n----------------------------------\n${lang.subTotalBill} ₹${bill.subTotal.toFixed(2)}\n${lang.discountBill} -₹${bill.discountAmount.toFixed(2)}\nGST (${gstValue}%): +₹${bill.gstAmount.toFixed(2)}\n\n*${lang.grandTotalBill}* *₹${bill.total.toFixed(2)}*\n\n${lang.visitAgain} ${lang.thanksForShopping}\n\nPowered by My Billing App:\n${appLink}`;
+            const message = `*${retailer.shopDetails.name}*\n\n*${lang.customer}:* ${customer.name}\n*${lang.mobile}:* ${customer.phone}\n\n*${lang.billNo}:* ${bill.billNo}\n*${lang.date}:* ${bill.date} ${bill.time}\n----------------------------------\n${bill.items.map(item => `${item.name} (${item.type === 'product' ? item.quantity + ' ' + item.unit : ''}) - ₹${item.total.toFixed(2)}`).join('\n')}\n----------------------------------\n${lang.subTotalBill} ₹${bill.subTotal.toFixed(2)}\n${lang.totalGst}: +₹${bill.totalGst.toFixed(2)}\n${lang.discountBill} -₹${bill.discountAmount.toFixed(2)}\n\n*${lang.grandTotalBill}* *₹${bill.total.toFixed(2)}*\n\n${lang.visitAgain} ${lang.thanksForShopping}\n\nPowered by My Billing App:\n${appLink}`;
             const customerPhone = customer.phone.replace(/[^0-9]/g, '');
             window.open(`https://wa.me/${customerPhone}?text=${encodeURIComponent(message)}`, '_blank');
         });
@@ -1986,6 +2312,34 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
     
+    const generatePurchaseReport = (format) => {
+        const retailer = allRetailerData[currentUserEmail];
+        const lang = translations[currentLanguage];
+        let fromDate = document.getElementById('purchaseReportFromDate').value;
+        let toDate = document.getElementById('purchaseReportToDate').value;
+        if (!fromDate || !toDate) { alert(lang.fillAllFields); return; }
+        fromDate = new Date(fromDate); fromDate.setHours(0, 0, 0, 0);
+        toDate = new Date(toDate); toDate.setHours(23, 59, 59, 999);
+        const filteredPurchases = (retailer.purchaseEntries || []).filter(entry => new Date(entry.date) >= fromDate && new Date(entry.date) <= toDate);
+        if (filteredPurchases.length === 0) { alert(lang.noDataFound); return; }
+        const headers = [lang.purchaseId, lang.date, lang.supplierName, lang.productName, lang.quantity, lang.totalColumn];
+        const data = filteredPurchases.map(entry => {
+            const supplier = (retailer.suppliers.find(s => s.id === entry.supplierId) || {}).name || 'N/A';
+            const totalCost = (entry.item.totalPrice * entry.item.quantity).toFixed(2);
+            return [entry.id, new Date(entry.date).toLocaleDateString(), supplier, entry.item.name, `${entry.item.quantity} ${entry.item.unit}`, totalCost];
+        });
+        const reportTitle = `${lang.purchaseReportTitle} (${fromDate.toLocaleDateString()} - ${toDate.toLocaleDateString()})`;
+        if (format === 'pdf') {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.text(reportTitle, 14, 15);
+            doc.autoTable({ head: [headers], body: data, startY: 20 });
+            doc.save(`Purchase-Report-${Date.now()}.pdf`);
+        } else if (format === 'csv') {
+            downloadCsv(`Purchase-Report-${Date.now()}.csv`, headers, data);
+        }
+    };
+
     const generateStockReportPdf = () => {
         const { jsPDF } = window.jspdf;
         const lang = translations[currentLanguage];
