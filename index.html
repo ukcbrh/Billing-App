@@ -100,9 +100,24 @@
         .preview-a4 { width: 100%; height: auto; }
         .preview-80mm { width: 80mm; margin: 0 auto; }
         .preview-58mm { width: 58mm; margin: 0 auto; }
-        .chart-container { background: var(--input-bg); padding: 20px; border-radius: 8px; box-shadow: 0 1px 4px var(--shadow-color); margin-top:30px; }
-        .dashboard-charts-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-top: 30px;}
-        @media (max-width: 992px) { .dashboard-charts-grid { grid-template-columns: 1fr; } }
+        .chart-container { background: var(--input-bg); padding: 20px; border-radius: 8px; box-shadow: 0 1px 4px var(--shadow-color); }
+        
+        /* New Dashboard Chart Grid */
+        .dashboard-top-charts {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+        .dashboard-grid, .top-products-container {
+            margin-top: 30px;
+        }
+        @media (max-width: 1200px) {
+            .dashboard-top-charts { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .dashboard-top-charts { grid-template-columns: 1fr; }
+        }
+        
         .radio-group { display: flex; gap: 15px; margin-bottom: 15px; align-items: center; }
         .radio-group label { font-weight: normal; }
         #purchase-tab, #purchase-tab input, #purchase-tab select, #purchase-tab textarea { font-family: 'Segoe UI', sans-serif; }
@@ -230,14 +245,22 @@
         
         <!-- डैशबोर्ड टैब -->
         <div id="dashboard-tab" class="tab-content active">
-             <div class="dashboard-charts-grid">
+             <div class="dashboard-top-charts">
                  <div class="chart-container">
-                    <h4 data-lang-key="salesPurchaseChartTitle">बिक्री और खरीद</h4>
-                     <canvas id="salesPurchaseChart"></canvas>
+                    <h4 data-lang-key="salesReportTitle">बिक्री</h4>
+                     <canvas id="salesChart"></canvas>
+                 </div>
+                 <div class="chart-container">
+                    <h4 data-lang-key="purchaseReportTitle">खरीद</h4>
+                     <canvas id="purchaseChart"></canvas>
                  </div>
                  <div class="chart-container">
                      <h4 data-lang-key="profitAndLoss">लाभ और हानि</h4>
                      <canvas id="profitLossChart"></canvas>
+                 </div>
+                 <div class="chart-container">
+                     <h4>ग्राहक वृद्धि</h4>
+                     <canvas id="customerChart"></canvas>
                  </div>
             </div>
              <div class="dashboard-grid">
@@ -246,7 +269,7 @@
                 <div class="dashboard-card"><h5 data-lang-key="totalExpenses">कुल खर्च</h5><p class="loss" id="totalExpensesDisplay">₹0.00</p></div>
                 <div class="dashboard-card"><h5 data-lang-key="totalBillsGenerated">कुल बिल</h5><p id="totalBillsDisplay">0</p></div>
             </div>
-             <div class="chart-container">
+             <div class="chart-container top-products-container">
                 <h4 data-lang-key="topSellingProducts">सबसे ज्यादा बिकने वाले उत्पाद</h4>
                 <table class="data-table"><thead><tr><th data-lang-key="productColumn">उत्पाद</th><th data-lang-key="quantitySold">बिकी हुई मात्रा</th></tr></thead><tbody id="topSellingTableBody"></tbody></table>
             </div>
@@ -601,7 +624,7 @@ document.addEventListener('DOMContentLoaded', () => {
             sellTab: "बिक्री", purchaseTab: "खरीद", inventoryTab: "इन्वेंटरी", expensesTab: "खर्चे", 
             customersTab: "ग्राहक", suppliersTab: "आपूर्तिकर्ता", profileTab: "प्रोफ़ाइल", backupRestoreTab: "बैकअप/रिस्टोर",
             reportsTab: "रिपोर्ट्स", customerDetails: "ग्राहक का विवरण", customerName: "ग्राहक का नाम:", customerPhone: "ग्राहक का फ़ोन:", customerAddress: "ग्राहक का पता:",
-            addItem: "आइटम जोड़ें", addProductLabel: "उत्पाद जोड़ें:", quantity: "मात्रा:", addToBill: "बिल में जोड़ें",
+            addItem: "आइटम जोड़ें", addProductLabel: "उत्पाद जोड़ें:", quantity: "मात्रा:", addToBill: "बिल में शामिल करें",
             currentBill: "वर्तमान बिल", productColumn: "उत्पाद", quantityColumn: "मात्रा", priceColumn: "मूल्य", totalColumn: "कुल",
             rateColumn: "दर", subTotal: "उप-योग (Subtotal):", discount: "डिस्काउंट:", gst: "GST (%):", grandTotal: "कुल देय:",
             generateBill: "बिल बनाएं", addProduct: "नया उत्पाद जोड़ें / अपडेट करें", productName: "उत्पाद का नाम:", priceLabel: "बिक्री मूल्य (₹):",
@@ -753,14 +776,14 @@ document.addEventListener('DOMContentLoaded', () => {
             productUpdatedSuccess: "پروڈکٹ کامیابی سے اپ ڈیٹ ہو گیا!", quantityUpdatedSuccess: "مصنوعات کی مقدار کو اپ ڈیٹ کر دیا گیا ہے!",
             selectProductFromList: "براہ کرم فہرست سے ایک پروڈکٹ منتخب کریں۔", stockUnavailable: "اسٹاک میں صرف {quantity} {unit} دستیاب ہے!",
             addItemsToBill: "بل بنانے کے لیے آئٹمز شامل کریں۔", customerInfoRequired: "بل بنانے کے لیے صارف کا نام اور फ़ोन नंबर आवश्यक है।",
-            profileSaved: "پروفائل محفوظ ہوگیا!", noBillToShare: "شیئر करने के लिए کوئی بل نہیں ہے۔", preparing: "تیار ہو رہا ہے...",
+            profileSaved: "پروفائل محفوظ ہوگیا!", noBillToShare: "شیئر کرنے کے लिए کوئی بل نہیں ہے۔", preparing: "تیار ہو رہا ہے...",
             imageCreationFailed: "تصویر بنانے میں خرابی۔", imageDownloaded: "بل کی تصویر ڈاؤن لوڈ ہو گئی ہے۔ براہ کرم اسے دستی طور پر شیئر کریں۔",
             noPurchaseHistory: "اس سپلائر کے لیے خریداری کی کوئی تاریخ نہیں ملی۔", noSalesHistory: "اس گاہک کے لیے فروخت کی کوئی تاریخ نہیں ملی۔",
             billNo: "بل نمبر:", date: "تاریخ:", total: "کل:", viewBill: "بل دیکھیں",
             stockReport: "اسٹاک رپورٹ", customer: "صارف:", name: "نام:", mobile: "موبائل:", subTotalBill: "ذیلی کل:", discountBill: "رعایت:",
             grandTotalBill: "کل قابل ادائیگی:", scanToPay: "ادائیگی کے لیے اسکین کریں", visitAgain: "دوبارہ تشریف لائیں!", thanksForShopping: "خریداری کے لئے شکریہ!",
             editBtn: "ترمیم", deleteBtn: "حذف کریں", updateBtn: "اپ ڈیٹ", deleteConfirm: "کیا آپ واقعی اس آئٹم کو حذف کرنا چاہتے ہیں؟",
-            backupRestoreTitle: "بیک اپ اور ریسٹور", backupInstructions: "اپنے تمام ڈیٹا کو ڈاؤن لوڈ करने के लिए 'بیک اپ بنائیں' پر کلک کریں۔ اپنا ڈیٹا بازیافت करने के लिए 'بیک اپ سے بحال کریں' کا استعمال کریں۔",
+            backupRestoreTitle: "بیک اپ اور ریسٹور", backupInstructions: "اپنے تمام ڈیٹا کو ڈاؤن لوڈ करने के लिए 'بیک اپ بنائیں' پر کلک کریں۔ اپنا ڈیٹا بازیافت کرنے के लिए 'بیک اپ سے بحال کریں' کا استعمال کریں۔",
             createBackup: "بیک اپ بنائیں", restoreBackup: "بیک اپ سے بحال کریں", restoreConfirm: "کیا آپ واقعی بحال کرنا چاہتے ہیں؟ یہ تمام موجودہ ڈیٹا کو اوور رائٹ کر دے گا۔",
             backupSuccess: "بیک اپ فائل کامیابی سے بن گئی۔", restoreSuccess: "ڈیٹا کامیابی سے بحال ہو گیا۔", invalidBackupFile: "غلط بیک اپ فائل۔",
             totalRevenue: "کل آمدنی", totalBillsGenerated: "کل بل", currentStockValue: "موجودہ اسٹاک کی قیمت",
@@ -802,7 +825,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- ग्लोबल वेरिएबल्स ---
     let allRetailerData = {}, currentUserEmail = null, currentBillItems = [], billCounter = 1, productForCalculator = null, currentLanguage = 'hi', editingProductId = null, currentBillForModal = null, editingSupplierId = null, editingCustomerId = null, editingBillId = null, editingPurchaseId = null, lastActiveTab = 'dashboard';
     let cropper, currentCropTarget;
-    let salesPurchaseChart, profitLossChart;
+    let salesChart, purchaseChart, profitLossChart, customerChart;
     const app = {}; window.app = app;
     const appLink = "https://my-billing-app.com";
     
@@ -881,15 +904,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const bills = retailer.bills || [];
         const purchaseEntries = retailer.purchaseEntries || [];
         const expenses = retailer.expenses || [];
+        const customers = retailer.customers || [];
         
         const totalSales = bills.reduce((sum, bill) => sum + bill.total, 0);
         const totalPurchases = purchaseEntries.reduce((sum, entry) => sum + (entry.item.totalPrice * entry.item.quantity), 0);
         const totalExpenses = expenses.reduce((sum, exp) => sum + exp.amount, 0);
         const totalBills = bills.length;
         
-        const grossProfit = totalSales - totalPurchases;
-        const netProfit = grossProfit - totalExpenses;
-
         const salesData = {};
         bills.forEach(bill => { bill.items.forEach(item => { if(item.type === 'product') { salesData[item.name] = (salesData[item.name] || 0) + item.quantity; } }); });
         const sortedProducts = Object.entries(salesData).sort((a, b) => b[1] - a[1]);
@@ -902,59 +923,134 @@ document.addEventListener('DOMContentLoaded', () => {
         const topSellingTableBody = document.getElementById('topSellingTableBody');
         topSellingTableBody.innerHTML = sortedProducts.slice(0, 5).map(([name, quantity]) => `<tr><td>${name}</td><td>${quantity.toFixed(2)}</td></tr>`).join('');
         
-        renderSalesPurchaseChart(bills, purchaseEntries);
+        renderSalesChart(bills);
+        renderPurchaseChart(purchaseEntries);
         renderProfitLossChart(totalSales, totalPurchases, totalExpenses);
+        renderCustomerChart(customers);
     };
 
-    const renderSalesPurchaseChart = (bills, purchases) => {
+    const renderSalesChart = (bills) => {
         const labels = Array.from({length: 12}, (_, i) => new Date(0, i).toLocaleString(currentLanguage, {month: 'short'}));
-        const salesData = new Array(12).fill(0);
-        const purchaseData = new Array(12).fill(0);
+        const data = new Array(12).fill(0);
 
         bills.forEach(bill => {
             const [d, m, y] = bill.date.split('-');
             const month = parseInt(m, 10) - 1;
-            if(month >= 0 && month < 12) salesData[month] += bill.total;
+            if(month >= 0 && month < 12 && new Date().getFullYear() == y) data[month] += bill.total;
         });
 
-        purchases.forEach(p => {
-            const month = new Date(p.date).getMonth();
-            if(month >= 0 && month < 12) purchaseData[month] += (p.item.totalPrice * p.item.quantity);
-        });
-
-        const ctx = document.getElementById('salesPurchaseChart').getContext('2d');
-        if (salesPurchaseChart) salesPurchaseChart.destroy();
-        salesPurchaseChart = new Chart(ctx, {
-            type: 'bar',
+        const ctx = document.getElementById('salesChart').getContext('2d');
+        if (salesChart) salesChart.destroy();
+        salesChart = new Chart(ctx, {
+            type: 'line',
             data: {
                 labels: labels,
-                datasets: [
-                    { label: translations[currentLanguage].totalSales, data: salesData, backgroundColor: 'rgba(39, 174, 96, 0.7)', borderColor: 'rgba(39, 174, 96, 1)', borderWidth: 1 },
-                    { label: translations[currentLanguage].totalPurchases, data: purchaseData, backgroundColor: 'rgba(231, 76, 60, 0.7)', borderColor: 'rgba(231, 76, 60, 1)', borderWidth: 1 }
-                ]
+                datasets: [{ 
+                    label: translations[currentLanguage].totalSales, 
+                    data: data, 
+                    borderColor: 'rgba(39, 174, 96, 1)',
+                    backgroundColor: 'rgba(39, 174, 96, 0.2)',
+                    fill: true,
+                    tension: 0.1
+                }]
             },
-            options: { responsive: true, scales: { y: { beginAtZero: true } } }
+            options: { responsive: true, scales: { y: { beginAtZero: true } }, plugins: { legend: { display: false } } }
         });
     };
     
-    const renderProfitLossChart = (sales, purchases, expenses) => {
-        const grossProfit = sales - purchases;
+    const renderPurchaseChart = (purchases) => {
+        const labels = Array.from({length: 12}, (_, i) => new Date(0, i).toLocaleString(currentLanguage, {month: 'short'}));
+        const data = new Array(12).fill(0);
+
+        purchases.forEach(p => {
+            const purchaseDate = new Date(p.date);
+            const month = purchaseDate.getMonth();
+            if(month >= 0 && month < 12 && purchaseDate.getFullYear() == new Date().getFullYear()) {
+                data[month] += (p.item.totalPrice * p.item.quantity);
+            }
+        });
+
+        const ctx = document.getElementById('purchaseChart').getContext('2d');
+        if (purchaseChart) purchaseChart.destroy();
+        purchaseChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{ 
+                    label: translations[currentLanguage].totalPurchases, 
+                    data: data, 
+                    backgroundColor: 'rgba(231, 76, 60, 0.7)', 
+                    borderColor: 'rgba(231, 76, 60, 1)', 
+                    borderWidth: 1 
+                }]
+            },
+            options: { responsive: true, scales: { y: { beginAtZero: true } }, plugins: { legend: { display: false } } }
+        });
+    };
+
+    const renderProfitLossChart = (totalSales, totalPurchases, totalExpenses) => {
+        const cogs = totalPurchases;
+        let netProfit = totalSales - cogs - totalExpenses;
+        let data, labels, colors;
+
+        if (netProfit < 0) {
+            data = [totalSales, Math.abs(netProfit)];
+            labels = ['कुल बिक्री', 'कुल हानि'];
+            colors = ['rgba(74, 144, 226, 0.8)', 'rgba(217, 30, 24, 0.8)'];
+        } else {
+            data = [cogs, totalExpenses, netProfit];
+            labels = ['बेचे गए माल की लागत', 'परिचालन व्यय', 'शुद्ध लाभ'];
+            colors = ['rgba(243, 156, 18, 0.8)', 'rgba(231, 76, 60, 0.8)', 'rgba(39, 174, 96, 0.8)'];
+        }
+        
         const ctx = document.getElementById('profitLossChart').getContext('2d');
         if(profitLossChart) profitLossChart.destroy();
         profitLossChart = new Chart(ctx, {
-            type: 'doughnut',
+            type: 'pie',
             data: {
-                labels: [translations[currentLanguage].totalProfit, translations[currentLanguage].totalExpenses],
+                labels: labels,
+                datasets: [{ data: data, backgroundColor: colors }]
+            },
+            options: { responsive: true, maintainAspectRatio: true }
+        });
+    };
+
+    const renderCustomerChart = (customers) => {
+        const labels = [];
+        const data = [];
+        const today = new Date();
+        for (let i = 11; i >= 0; i--) {
+            const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+            labels.push(d.toLocaleString('default', { month: 'short', year: '2-digit' }));
+            data.push(0);
+        }
+
+        customers.forEach(customer => {
+            const customerDate = new Date(customer.id);
+            const monthDiff = (today.getFullYear() - customerDate.getFullYear()) * 12 + (today.getMonth() - customerDate.getMonth());
+            if (monthDiff >= 0 && monthDiff < 12) {
+                data[11 - monthDiff]++;
+            }
+        });
+
+        const ctx = document.getElementById('customerChart').getContext('2d');
+        if (customerChart) customerChart.destroy();
+        customerChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
                 datasets: [{
-                    data: [grossProfit > 0 ? grossProfit : 0, expenses],
-                    backgroundColor: ['rgba(39, 174, 96, 0.8)', 'rgba(231, 76, 60, 0.8)'],
-                    borderColor: [ 'rgba(39, 174, 96, 1)', 'rgba(231, 76, 60, 1)'],
+                    label: 'नए ग्राहक',
+                    data: data,
+                    backgroundColor: 'rgba(52, 152, 219, 0.7)',
+                    borderColor: 'rgba(52, 152, 219, 1)',
                     borderWidth: 1
                 }]
             },
-            options: { responsive: true, cutout: '60%' }
+            options: { responsive: true, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }, plugins: { legend: { display: false } } }
         });
     };
+
 
     const renderAllUI = () => {
         if (!currentUserEmail || !allRetailerData[currentUserEmail]) return;
