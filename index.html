@@ -1,3 +1,4 @@
+नमस्ते,
 <!DOCTYPE html>
 <html lang="hi" dir="ltr">
 <head>
@@ -102,22 +103,25 @@
         .preview-58mm { width: 58mm; margin: 0 auto; }
         .chart-container { background: var(--input-bg); padding: 20px; border-radius: 8px; box-shadow: 0 1px 4px var(--shadow-color); }
         
-        /* New Dashboard Chart Grid */
         .dashboard-top-charts {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 20px;
+        }
+        .dashboard-top-charts .chart-container {
+            height: 280px;
+            display: flex;
+            flex-direction: column;
+        }
+        .dashboard-top-charts .chart-container canvas {
+            flex-grow: 1;
+            min-height: 0;
+            max-height: 100%;
         }
         .dashboard-grid, .top-products-container {
             margin-top: 30px;
         }
-        @media (max-width: 1200px) {
-            .dashboard-top-charts { grid-template-columns: repeat(2, 1fr); }
-        }
-        @media (max-width: 768px) {
-            .dashboard-top-charts { grid-template-columns: 1fr; }
-        }
-        
+
         .radio-group { display: flex; gap: 15px; margin-bottom: 15px; align-items: center; }
         .radio-group label { font-weight: normal; }
         #purchase-tab, #purchase-tab input, #purchase-tab select, #purchase-tab textarea { font-family: 'Segoe UI', sans-serif; }
@@ -173,9 +177,8 @@
             margin: 0;
         }
 
-
         @media print {
-             body > *:not(.printable-area-for-print) { display: none; }
+             body > *:not(.printable-area-for-print) { display: none !important; }
             .printable-area-for-print { display: block !important; position: absolute; left: 0; top: 0; margin: 0; padding: 0; }
         }
     </style>
@@ -225,8 +228,9 @@
                 <option value="en">English</option>
                 <option value="ur">اردو</option>
             </select>
-            <div class="theme-switch-wrapper"><label class="theme-switch" for="theme-toggle"><input type="checkbox" id="theme-toggle"><span class="slider"></span></label></div>
-            <button id="logoutBtn" style="width: auto; margin-left:20px;" data-lang-key="logout">लॉगआउट</button>
+            <button id="headerSettingsBtn" title="Settings" style="width: auto; margin-left: 20px; background: transparent; border: none; cursor: pointer; padding: 5px; line-height: 1;">
+                <svg xmlns="http://www.w3.org/2000/svg" height="28px" viewBox="0 0 24 24" width="28px" fill="var(--text-color)"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg>
+            </button>
         </div>
         <h2 id="retailerShopName"></h2>
         <hr>
@@ -257,10 +261,6 @@
                  <div class="chart-container">
                      <h4 data-lang-key="profitAndLoss">लाभ और हानि</h4>
                      <canvas id="profitLossChart"></canvas>
-                 </div>
-                 <div class="chart-container">
-                     <h4>ग्राहक वृद्धि</h4>
-                     <canvas id="customerChart"></canvas>
                  </div>
             </div>
              <div class="dashboard-grid">
@@ -559,7 +559,20 @@
                     </div>
                 </div>
             </div>
+            <div>
+                <h4 data-lang-key="settingsTitle">सेटिंग्स</h4>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0;">
+                    <label for="theme-toggle-sidebar" style="margin-bottom: 0;" data-lang-key="darkModeLabel">डार्क मोड</label>
+                    <div class="theme-switch-wrapper" style="margin-left: 0;">
+                        <label class="theme-switch" for="theme-toggle-sidebar">
+                            <input type="checkbox" id="theme-toggle-sidebar">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
             <button id="saveProfileBtn" style="margin-top:20px;" data-lang-key="saveProfile">प्रोफ़ाइल सेव करें</button>
+            <button id="logoutBtnSidebar" style="margin-top:10px; background-color: #e74c3c;" data-lang-key="logout">लॉगआउट</button>
         </div>
     </div>
     
@@ -682,7 +695,8 @@ document.addEventListener('DOMContentLoaded', () => {
             withoutGst: "बिना GST", withGst: "GST सहित", printPurchaseNote: "खरीद नोट प्रिंट करें",
             signature: "हस्ताक्षर:", stamp: "स्टाम्प:", authorizedSignatory: "अधिकृत हस्ताक्षरकर्ता",
             purchaseReportTitle: "खरीद रिपोर्ट", purchaseReportDesc: "एक तिथि सीमा के भीतर सभी खरीद की विस्तृत सूची डाउनलोड करें।", supplierAddressLabel: "आपूर्तिकर्ता का पता:",
-            purchaseId: "खरीद आईडी", totalPrice: "कुल मूल्य/इकाई (₹):", lineTotal: "कुल:", sellingPriceLabel: "बिक्री मूल्य (₹):", totalGst: "कुल GST:", purchaseBillNo: "खरीद बिल नंबर:"
+            purchaseId: "खरीद आईडी", totalPrice: "कुल मूल्य/इकाई (₹):", lineTotal: "कुल:", sellingPriceLabel: "बिक्री मूल्य (₹):", totalGst: "कुल GST:", purchaseBillNo: "खरीद बिल नंबर:",
+            settingsTitle: "सेटिंग्स", darkModeLabel: "डार्क मोड"
         },
         'en': {
             welcomeTitle: "Welcome Billing App", login: "Login", createAccount: "Create New Account", back: "← Back",
@@ -750,7 +764,8 @@ document.addEventListener('DOMContentLoaded', () => {
             withoutGst: "Without GST", withGst: "With GST", printPurchaseNote: "Print Purchase Note",
             signature: "Signature:", stamp: "Stamp:", authorizedSignatory: "Authorized Signatory",
             purchaseReportTitle: "Purchase Report", purchaseReportDesc: "Download a detailed list of all purchases within a date range.", supplierAddressLabel: "Supplier Address:",
-            purchaseId: "Purchase ID", totalPrice: "Total Price/Unit (₹):", lineTotal: "Total:", sellingPriceLabel: "Selling Price (₹):", totalGst: "Total GST:", purchaseBillNo: "Purchase Bill No:"
+            purchaseId: "Purchase ID", totalPrice: "Total Price/Unit (₹):", lineTotal: "Total:", sellingPriceLabel: "Selling Price (₹):", totalGst: "Total GST:", purchaseBillNo: "Purchase Bill No:",
+            settingsTitle: "Settings", darkModeLabel: "Dark Mode"
         },
         'ur': {
             welcomeTitle: "Welcome Billing App", login: "لاگ ان کریں", createAccount: "نیا اکاؤنٹ بنائیں", back: "← واپس",
@@ -775,7 +790,7 @@ document.addEventListener('DOMContentLoaded', () => {
             fillAllFields: "براہ کرم تمام خانوں میں صحیح معلومات درج کریں۔", productAddedSuccess: "پروڈکٹ کامیابی سے شامل کیا گیا!",
             productUpdatedSuccess: "پروڈکٹ کامیابی سے اپ ڈیٹ ہو گیا!", quantityUpdatedSuccess: "مصنوعات کی مقدار کو اپ ڈیٹ کر دیا گیا ہے!",
             selectProductFromList: "براہ کرم فہرست سے ایک پروڈکٹ منتخب کریں۔", stockUnavailable: "اسٹاک میں صرف {quantity} {unit} دستیاب ہے!",
-            addItemsToBill: "بل بنانے کے لیے آئٹمز شامل کریں۔", customerInfoRequired: "بل بنانے کے لیے صارف کا نام اور फ़ोन नंबर आवश्यक है।",
+            addItemsToBill: "بل بنانے کے लिए آئٹمز شامل کریں۔", customerInfoRequired: "بل بنانے کے لیے صارف کا نام اور फ़ोन नंबर आवश्यक है।",
             profileSaved: "پروفائل محفوظ ہوگیا!", noBillToShare: "شیئر کرنے کے लिए کوئی بل نہیں ہے۔", preparing: "تیار ہو رہا ہے...",
             imageCreationFailed: "تصویر بنانے میں خرابی۔", imageDownloaded: "بل کی تصویر ڈاؤن لوڈ ہو گئی ہے۔ براہ کرم اسے دستی طور پر شیئر کریں۔",
             noPurchaseHistory: "اس سپلائر کے لیے خریداری کی کوئی تاریخ نہیں ملی۔", noSalesHistory: "اس گاہک کے لیے فروخت کی کوئی تاریخ نہیں ملی۔",
@@ -783,7 +798,7 @@ document.addEventListener('DOMContentLoaded', () => {
             stockReport: "اسٹاک رپورٹ", customer: "صارف:", name: "نام:", mobile: "موبائل:", subTotalBill: "ذیلی کل:", discountBill: "رعایت:",
             grandTotalBill: "کل قابل ادائیگی:", scanToPay: "ادائیگی کے لیے اسکین کریں", visitAgain: "دوبارہ تشریف لائیں!", thanksForShopping: "خریداری کے لئے شکریہ!",
             editBtn: "ترمیم", deleteBtn: "حذف کریں", updateBtn: "اپ ڈیٹ", deleteConfirm: "کیا آپ واقعی اس آئٹم کو حذف کرنا چاہتے ہیں؟",
-            backupRestoreTitle: "بیک اپ اور ریسٹور", backupInstructions: "اپنے تمام ڈیٹا کو ڈاؤن لوڈ करने के लिए 'بیک اپ بنائیں' پر کلک کریں۔ اپنا ڈیٹا بازیافت کرنے के लिए 'بیک اپ سے بحال کریں' کا استعمال کریں۔",
+            backupRestoreTitle: "بیک اپ اور ریسٹور", backupInstructions: "اپنے تمام ڈیٹا کو ڈاؤن لوڈ करने के लिए 'بیک اپ بنائیں' پر کلک کریں۔ اپنا ڈیٹا بازیافت کرنے کے لیے 'بیک اپ سے بحال کریں' کا استعمال کریں۔",
             createBackup: "بیک اپ بنائیں", restoreBackup: "بیک اپ سے بحال کریں", restoreConfirm: "کیا آپ واقعی بحال کرنا چاہتے ہیں؟ یہ تمام موجودہ ڈیٹا کو اوور رائٹ کر دے گا۔",
             backupSuccess: "بیک اپ فائل کامیابی سے بن گئی۔", restoreSuccess: "ڈیٹا کامیابی سے بحال ہو گیا۔", invalidBackupFile: "غلط بیک اپ فائل۔",
             totalRevenue: "کل آمدنی", totalBillsGenerated: "کل بل", currentStockValue: "موجودہ اسٹاک کی قیمت",
@@ -818,14 +833,15 @@ document.addEventListener('DOMContentLoaded', () => {
             withoutGst: "بغیر جی ایس ٹی", withGst: "جی ایس ٹی کے ساتھ", printPurchaseNote: "خریداری کا نوٹ پرنٹ کریں",
             signature: "دستخط:", stamp: "مہر:", authorizedSignatory: "مجاز دستخط کنندہ",
             purchaseReportTitle: "خریداری کی رپورٹ", purchaseReportDesc: "تاریخ کی حد کے اندر تمام خریداریوں کی تفصیلی فہرست ڈاؤن لوڈ کریں۔", supplierAddressLabel: "سپلائر کا پتہ:",
-            purchaseId: "خریداری کی شناخت", totalPrice: "کل قیمت/یونٹ (₹):", lineTotal: "کل:", sellingPriceLabel: "فروخت کی قیمت (₹):", totalGst: "کل جی ایس ٹی:", purchaseBillNo: "خریداری بل نمبر:"
+            purchaseId: "خریداری کی شناخت", totalPrice: "کل قیمت/یونٹ (₹):", lineTotal: "کل:", sellingPriceLabel: "فروخت کی قیمت (₹):", totalGst: "کل جی ایس ٹی:", purchaseBillNo: "خریداری بل نمبر:",
+            settingsTitle: "ترتیبات", darkModeLabel: "ڈارک موڈ"
         }
     };
     
     // --- ग्लोबल वेरिएबल्स ---
     let allRetailerData = {}, currentUserEmail = null, currentBillItems = [], billCounter = 1, productForCalculator = null, currentLanguage = 'hi', editingProductId = null, currentBillForModal = null, editingSupplierId = null, editingCustomerId = null, editingBillId = null, editingPurchaseId = null, lastActiveTab = 'dashboard';
     let cropper, currentCropTarget;
-    let salesChart, purchaseChart, profitLossChart, customerChart;
+    let salesChart, purchaseChart, profitLossChart;
     const app = {}; window.app = app;
     const appLink = "https://my-billing-app.com";
     
@@ -904,7 +920,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const bills = retailer.bills || [];
         const purchaseEntries = retailer.purchaseEntries || [];
         const expenses = retailer.expenses || [];
-        const customers = retailer.customers || [];
         
         const totalSales = bills.reduce((sum, bill) => sum + bill.total, 0);
         const totalPurchases = purchaseEntries.reduce((sum, entry) => sum + (entry.item.totalPrice * entry.item.quantity), 0);
@@ -926,7 +941,6 @@ document.addEventListener('DOMContentLoaded', () => {
         renderSalesChart(bills);
         renderPurchaseChart(purchaseEntries);
         renderProfitLossChart(totalSales, totalPurchases, totalExpenses);
-        renderCustomerChart(customers);
     };
 
     const renderSalesChart = (bills) => {
@@ -954,7 +968,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     tension: 0.1
                 }]
             },
-            options: { responsive: true, scales: { y: { beginAtZero: true } }, plugins: { legend: { display: false } } }
+            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } }, plugins: { legend: { display: false } } }
         });
     };
     
@@ -984,7 +998,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     borderWidth: 1 
                 }]
             },
-            options: { responsive: true, scales: { y: { beginAtZero: true } }, plugins: { legend: { display: false } } }
+            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } }, plugins: { legend: { display: false } } }
         });
     };
 
@@ -1011,46 +1025,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 labels: labels,
                 datasets: [{ data: data, backgroundColor: colors }]
             },
-            options: { responsive: true, maintainAspectRatio: true }
+            options: { responsive: true, maintainAspectRatio: false }
         });
     };
-
-    const renderCustomerChart = (customers) => {
-        const labels = [];
-        const data = [];
-        const today = new Date();
-        for (let i = 11; i >= 0; i--) {
-            const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
-            labels.push(d.toLocaleString('default', { month: 'short', year: '2-digit' }));
-            data.push(0);
-        }
-
-        customers.forEach(customer => {
-            const customerDate = new Date(customer.id);
-            const monthDiff = (today.getFullYear() - customerDate.getFullYear()) * 12 + (today.getMonth() - customerDate.getMonth());
-            if (monthDiff >= 0 && monthDiff < 12) {
-                data[11 - monthDiff]++;
-            }
-        });
-
-        const ctx = document.getElementById('customerChart').getContext('2d');
-        if (customerChart) customerChart.destroy();
-        customerChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'नए ग्राहक',
-                    data: data,
-                    backgroundColor: 'rgba(52, 152, 219, 0.7)',
-                    borderColor: 'rgba(52, 152, 219, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: { responsive: true, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }, plugins: { legend: { display: false } } }
-        });
-    };
-
 
     const renderAllUI = () => {
         if (!currentUserEmail || !allRetailerData[currentUserEmail]) return;
@@ -2042,13 +2019,26 @@ document.addEventListener('DOMContentLoaded', () => {
         productForCalculator = null;
     };
 
+    const handleThemeToggle = (e) => {
+        const isChecked = e.target.checked;
+        document.body.classList.toggle('dark-mode', isChecked);
+        localStorage.setItem('theme', isChecked ? 'dark' : 'light');
+        document.getElementById('theme-toggle-sidebar').checked = isChecked;
+    };
 
     const attachAllEventListeners = () => {
         document.getElementById('goToLoginBtn').addEventListener('click', () => showPage('login-page'));
         document.getElementById('goToSignUpBtn').addEventListener('click', () => showPage('signup-page'));
         document.getElementById('loginBackBtn').addEventListener('click', () => showPage('welcome-page'));
         document.getElementById('signupBackBtn').addEventListener('click', () => showPage('welcome-page'));
-        document.getElementById('logoutBtn').addEventListener('click', logout);
+        document.getElementById('logoutBtnSidebar').addEventListener('click', logout);
+        
+        document.getElementById('headerSettingsBtn').addEventListener('click', () => {
+             document.querySelectorAll('.tab-link').forEach(el => el.classList.remove('active'));
+             document.querySelector('.tab-link[data-tab="profile"]').classList.add('active');
+             document.getElementById('profile-sidebar').classList.add('open');
+             document.getElementById('sidebar-overlay').classList.remove('hidden');
+        });
         
         document.getElementById('appTabsContainer').addEventListener('click', (e) => {
             if (e.target.matches('.tab-link')) {
@@ -2259,9 +2249,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const retailer = allRetailerData[currentUserEmail];
             const customer = retailer.customers.find(c => c.id == bill.customerId);
             if (!retailer || !customer) { alert(lang.noBillToShare); return; }
+            
             const message = `*${retailer.shopDetails.name}*\n\n*${lang.customer}:* ${customer.name}\n*${lang.mobile}:* ${customer.phone}\n\n*${lang.billNo}:* ${bill.billNo}\n*${lang.date}:* ${bill.date} ${bill.time}\n----------------------------------\n${bill.items.map(item => `${item.name} (${item.type === 'product' ? item.quantity + ' ' + item.unit : ''}) - ₹${item.total.toFixed(2)}`).join('\n')}\n----------------------------------\n${lang.subTotalBill} ₹${bill.subTotal.toFixed(2)}\n${lang.totalGst}: +₹${bill.totalGst.toFixed(2)}\n${lang.discountBill} -₹${bill.discountAmount.toFixed(2)}\n\n*${lang.grandTotalBill}* *₹${bill.total.toFixed(2)}*\n\n${lang.visitAgain} ${lang.thanksForShopping}\n\nPowered by My Billing App:\n${appLink}`;
-            const customerPhone = customer.phone.replace(/[^0-9]/g, '');
-            window.open(`https://wa.me/${customerPhone}?text=${encodeURIComponent(message)}`, '_blank');
+            
+            let customerPhone = customer.phone.replace(/[^0-9]/g, '');
+            if (customerPhone.length === 10) {
+                customerPhone = '91' + customerPhone;
+            }
+
+            const isMobile = /Mobi/i.test(window.navigator.userAgent);
+            const whatsappUrl = isMobile 
+                ? `https://wa.me/${customerPhone}?text=${encodeURIComponent(message)}`
+                : `https://web.whatsapp.com/send?phone=${customerPhone}&text=${encodeURIComponent(message)}`;
+
+            window.open(whatsappUrl, '_blank');
         });
 
         document.getElementById('shareBillImageBtn').addEventListener('click', () => {
@@ -2338,12 +2339,12 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('dynamic-print-style').innerHTML = '';
         });
 
-        const themeToggle = document.getElementById('theme-toggle');
-        themeToggle.addEventListener('change', function() {
-            document.body.classList.toggle('dark-mode', this.checked);
-            localStorage.setItem('theme', this.checked ? 'dark' : 'light');
-        });
-        if (localStorage.getItem('theme') === 'dark') { document.body.classList.add('dark-mode'); themeToggle.checked = true; }
+        document.getElementById('theme-toggle-sidebar').addEventListener('change', handleThemeToggle);
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark-mode');
+            document.getElementById('theme-toggle-sidebar').checked = true;
+        }
         
         const cropperModal = document.getElementById('cropper-modal');
         const imageToCrop = document.getElementById('image-to-crop');
