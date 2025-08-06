@@ -61,10 +61,10 @@
         .tab-content { display: none; } .tab-content.active { display: block; }
         .main-layout { display: grid; gap: 30px; grid-template-columns: 1fr 1.5fr; }
         .customer-details-grid { display: grid; gap: 20px; grid-template-columns: 1fr 1fr; }
-        @media (max-width: 768px) { .main-layout, .profile-layout, .customer-details-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) { .main-layout, .profile-layout, .customer-details-grid, .balance-sheet-grid { grid-template-columns: 1fr; } }
         .data-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.9em; }
         .data-table th, .data-table td { border: 1px solid var(--border-color); padding: 8px; text-align: left; }
-        .data-table tfoot th { text-align: right; }
+        .data-table tfoot th, .data-table tfoot td { text-align: right; font-weight:bold; }
         .data-table .credit-col { color: #27ae60; } .data-table .debit-col { color: #e74c3c; }
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); }
         .modal-content { background-color: var(--container-bg); margin: 5% auto; padding: 20px; border: 1px solid #888; width: 90%; max-width: 700px; font-family: 'Segoe UI', sans-serif; border-radius: 8px; }
@@ -105,7 +105,6 @@
         .preview-80mm { width: 80mm; margin: 0 auto; }
         .preview-58mm { width: 58mm; margin: 0 auto; }
         .chart-container { background: var(--input-bg); padding: 20px; border-radius: 8px; box-shadow: 0 1px 4px var(--shadow-color); }
-        
         .dashboard-top-charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
         .dashboard-top-charts .chart-container { height: 280px; display: flex; flex-direction: column; }
         .dashboard-top-charts .chart-container canvas { flex-grow: 1; min-height: 0; max-height: 100%; }
@@ -134,6 +133,12 @@
         .inventory-filters > div { display: flex; gap: 10px; align-items: center; }
         .inventory-filters label { margin-bottom: 0; font-weight: normal; }
         .column-toggles { border-left: 1px solid var(--border-color); padding-left: 15px; }
+        .balance-sheet-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        .balance-sheet-col table { width: 100%; }
+        .balance-sheet-col th { background-color: var(--input-bg); padding: 10px; }
+        .balance-sheet-col td { padding: 8px; }
+        .balance-sheet-col tfoot td { font-weight: bold; border-top: 2px solid var(--text-color); }
+        .ledger-particular { cursor: pointer; color: var(--primary-color); text-decoration: underline; }
 
         @media print {
              body > *:not(.printable-area-for-print) { display: none !important; }
@@ -186,7 +191,7 @@
                 <option value="en">English</option>
             </select>
             <button id="headerSettingsBtn" title="Settings" style="width: auto; margin-left: 20px; background: transparent; border: none; cursor: pointer; padding: 5px; line-height: 1;">
-                <svg xmlns="http://www.w3.org/2000/svg" height="28px" viewBox="0 0 24 24" width="28px" fill="var(--text-color)"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61-.25-1.17-.59-1.69-.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24-.42-.12-.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" height="28px" viewBox="0 0 24 24" width="28px" fill="var(--text-color)"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61-.25-1.17-.59-1.69-.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24-.42-.12-.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69-.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg>
             </button>
         </div>
         <h2 id="retailerShopName"></h2>
@@ -201,6 +206,7 @@
             <span class="tab-link" data-tab="expenses" data-lang-key="expensesTab">खर्चे</span>
             <span class="tab-link" data-tab="suppliers" data-lang-key="suppliersTab">आपूर्तिकर्ता</span>
             <span class="tab-link" data-tab="customers" data-lang-key="customersTab">ग्राहक</span>
+            <span class="tab-link" data-tab="account" data-lang-key="accountTab">लेखा</span>
             <span class="tab-link" data-tab="reports" data-lang-key="reportsTab">रिपोर्ट्स</span>
             <span class="tab-link" data-tab="profile" data-lang-key="profileTab">प्रोफ़ाइल</span>
             <span class="tab-link" data-tab="backup" data-lang-key="backupRestoreTab">बैकअप/रिस्टोर</span>
@@ -661,6 +667,34 @@
             </div>
         </div>
         
+        <!-- अकाउंट टैब (NEW) -->
+        <div id="account-tab" class="tab-content">
+            <h4 data-lang-key="balanceSheet">बैलेंस शीट</h4>
+            <div id="balanceSheetContainer" class="balance-sheet-grid report-section">
+                <!-- Balance Sheet content will be generated by JS -->
+            </div>
+            
+            <h4 data-lang-key="ledger" style="margin-top: 30px;">खाता बही</h4>
+            <div class="report-section">
+                <label for="ledgerAccountSelect" data-lang-key="selectAccount">खाता चुनें:</label>
+                <select id="ledgerAccountSelect" style="margin-bottom: 20px;"></select>
+                <div id="ledgerContainer" style="overflow-x:auto;">
+                    <table class="data-table" id="ledgerTable">
+                        <thead>
+                            <tr>
+                                <th data-lang-key="dateColumn">तारीख</th>
+                                <th data-lang-key="particulars">विवरण</th>
+                                <th data-lang-key="debit" class="debit-col">डेबिट (₹)</th>
+                                <th data-lang-key="credit" class="credit-col">क्रेडिट (₹)</th>
+                                <th data-lang-key="balance">शेष (₹)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ledgerTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
         <div id="reports-tab" class="tab-content">
             <h4 data-lang-key="downloadReportsTitle">रिपोर्ट्स डाउनलोड करें</h4>
             <div class="report-section">
@@ -870,7 +904,6 @@ document.addEventListener('DOMContentLoaded', () => {
             addExpenseTitle: "नया खर्च जोड़ें", expenseDescription: "खर्च का विवरण:", expenseAmount: "राशि (₹):",
             expenseDate: "खर्च की तारीख:", addExpenseBtn: "खर्च जोड़ें", expenseListTitle: "खर्चों की सूची",
             descriptionColumn: "विवरण", amountColumn: "राशि", dateColumn: "तारीख", expenseAddedSuccess: "खर्च सफलतापूर्वक जोड़ा गया।",
-
             printPreviewTitle: "प्रिंट प्रीव्यू", paperSize: "पेपर साइज:", printNow: "अभी प्रिंट करें", totalSales: "कुल बिक्री",
             totalPurchases: "कुल खरीद", profitAndLoss: "लाभ और हानि", product: "उत्पाद", service: "सर्विस", serviceDescription: "सर्विस विवरण:",
             serviceCharge: "सर्विस चार्ज (₹):", withoutGst: "बिना GST", withGst: "GST सहित", printPurchaseNote: "खरीद नोट प्रिंट करें",
@@ -879,7 +912,7 @@ document.addEventListener('DOMContentLoaded', () => {
             purchaseId: "खरीद आईडी", totalPrice: "कुल मूल्य/इकाई (₹):", lineTotal: "कुल:", sellingPriceLabel: "बिक्री मूल्य/यूनिट (₹)",
             totalGst: "कुल GST:", purchaseBillNo: "खरीद बिल नंबर:", settingsTitle: "सेटिंग्स", darkModeLabel: "डार्क मोड",
             purchaseBillDate: "बिल की तारीख:", hsnSac: "HSN/SAC:", purchasePriceDetails: "खरीद मूल्य विवरण",
-            totalPurchasePrice: "कुल खरीद मूल्य/यूनिट (₹)", sellingPriceDetails: "बिक्री मूल्य विवरण", profitMargin: "मार्जिन", margin: "मार्जिन",
+            totalPurchasePrice: "कुल खरीद मूल्य/यूनिट (₹)", sellingPriceDetails: "बिक्री मूल्य विवरण", profitMargin: "मार्जिन",
             cashFlowTab: "कैश फ्लो", addCashFlowTitle: "नई कैश एंट्री", transactionType: "लेन-देन प्रकार", cashIn: "कैश-इन (जमा)",
             cashOut: "कैश-आउट (निकासी)", associatedParty: "संबंधित पार्टी (ग्राहक/आपूर्तिकर्ता)", notes: "नोट्स (विवरण)",
             addEntry: "एंट्री जोड़ें", cashFlowSummary: "कैश फ्लो सारांश", totalCashIn: "कुल जमा", totalCashOut: "कुल निकासी",
@@ -887,14 +920,18 @@ document.addEventListener('DOMContentLoaded', () => {
             confirmDeleteBill: "क्या आप वाकई इस बिल को हटाना चाहते हैं? यह क्रिया स्टॉक को वापस जोड़ देगी।",
             confirmDeletePurchase: "क्या आप वाकई इस खरीद को हटाना चाहते हैं? यह क्रिया स्टॉक को समायोजित कर देगी।",
             cashFlowLedger: "कैश फ्लो लेजर", paymentMode: "भुगतान का तरीका", online: "ऑनलाइन", check: "चेक", qr: "QR", cash: "नकद",
-            recentSales: "हाल की बिक्री", stockItemUpdated: "स्टॉक आइटम सफलतापूर्वक अपडेट किया गया!", debit: "डेबिट (Debit)", credit: "क्रेडिट (Credit)",
+            recentSales: "हाल की बिक्री", stockItemUpdated: "स्टॉक आइटम सफलतापूर्वक अपडेट किया गया!", debit: "डेबिट", credit: "क्रेडिट",
             balance: "बैलेंस", receivable: "बकाया (Receivable)", payable: "देय (Payable)", addPayment: "भुगतान जोड़ें",
             paymentReceived: "भुगतान प्राप्त हुआ", paymentMade: "भुगतान किया गया", sendReminder: "रिमाइंडर भेजें", 
             reminderMessage: "प्रिय {customerName},\nआपके खाते का कुल बकाया ₹{balance} है। कृपया जल्द से जल्द भुगतान करें।\nधन्यवाद,\n{shopName}",
             currentEstimate: "वर्तमान एस्टीमेट", addToEstimate: "एस्टीमेट में जोड़ें", generateEstimate: "एस्टीमेट बनाएं",
             estimateNo: "एस्टीमेट नं:", estimateDate: "एस्टीमेट तारीख:",
             totalStockValuePurchase: "कुल स्टॉक मूल्य (खरीद)", totalStockValueSale: "कुल स्टॉक मूल्य (बिक्री)",
-            purchaseValue: "कुल खरीद मूल्य", saleValue: "कुल बिक्री मूल्य", totalStock: "कुल योग"
+            purchaseValue: "कुल खरीद मूल्य", saleValue: "कुल बिक्री मूल्य", totalStock: "कुल योग",
+            accountTab: "लेखा", balanceSheet: "बैलेंस शीट", ledger: "खाता बही", assets: "संपत्ति (Assets)", liabilities: "देनदारियां (Liabilities)",
+            selectAccount: "खाता चुनें:", particulars: "विवरण", capital: "पूंजी (Capital)", accountsReceivable: "प्राप्य खाते (Debtors)",
+            accountsPayable: "देय खाते (Creditors)", cashInHand: "हाथ में नकदी (Cash)", stockValue: "स्टॉक का मूल्य (मूल खरीद पर)",
+            totalAssets: "कुल संपत्ति", totalLiabilities: "कुल देनदारियां"
         },
         'en': {
             login: "Login", createAccount: "Create New Account", back: "← Back", shopNameLabel: "Shop Name:", emailLabel: "Email:",
@@ -957,7 +994,7 @@ document.addEventListener('DOMContentLoaded', () => {
             totalGst: "Total GST:", purchaseBillNo: "Purchase Bill No:", settingsTitle: "Settings", darkModeLabel: "Dark Mode",
             purchaseBillDate: "Bill Date:", hsnSac: "HSN/SAC:", purchasePriceDetails: "Purchase Price Details",
             totalPurchasePrice: "Total Purchase Price/Unit (₹)", sellingPriceDetails: "Selling Price Details", profitMargin: "Margin",
-            margin: "Margin", cashFlowTab: "Cash Flow", addCashFlowTitle: "New Cash Entry", transactionType: "Transaction Type",
+            cashFlowTab: "Cash Flow", addCashFlowTitle: "New Cash Entry", transactionType: "Transaction Type",
             cashIn: "Cash-In", cashOut: "Cash-Out", associatedParty: "Associated Party (Customer/Supplier)", notes: "Notes (Description)",
             addEntry: "Add Entry", cashFlowSummary: "Cash Flow Summary", totalCashIn: "Total Cash-In", totalCashOut: "Total Cash-Out",
             netBalance: "Net Balance", cashFlowHistory: "Cash Flow History", confirmDeleteCustomer: "Are you sure you want to delete this customer?",
@@ -971,7 +1008,11 @@ document.addEventListener('DOMContentLoaded', () => {
             currentEstimate: "Current Estimate", addToEstimate: "Add to Estimate", generateEstimate: "Generate Estimate",
             estimateNo: "Estimate No:", estimateDate: "Estimate Date:",
             totalStockValuePurchase: "Total Stock Value (Purchase)", totalStockValueSale: "Total Stock Value (Sale)",
-            purchaseValue: "Total Purchase Value", saleValue: "Total Sale Value", totalStock: "Total"
+            purchaseValue: "Total Purchase Value", saleValue: "Total Sale Value", totalStock: "Total",
+            accountTab: "Account", balanceSheet: "Balance Sheet", ledger: "Ledger", assets: "Assets", liabilities: "Liabilities",
+            selectAccount: "Select Account:", particulars: "Particulars", capital: "Capital", accountsReceivable: "Accounts Receivable (Debtors)",
+            accountsPayable: "Accounts Payable (Creditors)", cashInHand: "Cash in Hand", stockValue: "Stock Value (at Purchase Cost)",
+            totalAssets: "Total Assets", totalLiabilities: "Total Liabilities"
         }
     };
     
@@ -1058,6 +1099,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('salesHistoryToDate').value = today;
             renderRecentSales();
+        } else if (tabName === 'account') {
+            renderAccountTab();
         }
     };
 
@@ -1208,6 +1251,10 @@ document.addEventListener('DOMContentLoaded', () => {
         renderPurchaseHistory();
         renderCashFlow();
         renderRecentSales();
+        // Render account tab if it's the active one
+        if (lastActiveTab === 'account') {
+            renderAccountTab();
+        }
     };
     const renderInventoryTable = () => {
         const retailerData = allRetailerData[currentUserEmail];
@@ -2834,6 +2881,206 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('estimateCounter', estimateCounter);
         resetEstimateForm();
     };
+    
+    // --- अकाउंट टैब फंक्शन (NEW) ---
+    const renderAccountTab = () => {
+        renderBalanceSheet();
+        populateLedgerAccounts();
+        renderLedger(document.getElementById('ledgerAccountSelect').value);
+    };
+
+    const getPartyBalance = (partyType, partyId) => {
+        const cashFlow = allRetailerData[currentUserEmail].cashFlow || [];
+        let balance = 0;
+        const entries = cashFlow.filter(e => e.partyId === `${partyType}-${partyId}`);
+        
+        entries.forEach(entry => {
+            if (partyType === 'customer') {
+                if (entry.type === 'debit_customer') balance += entry.amount;
+                if (entry.type === 'credit_customer') balance -= entry.amount;
+            } else { // supplier
+                if (entry.type === 'credit_supplier') balance += entry.amount;
+                if (entry.type === 'debit_supplier') balance -= entry.amount;
+            }
+        });
+        return balance;
+    };
+    
+    const renderBalanceSheet = () => {
+        const retailer = allRetailerData[currentUserEmail];
+        if (!retailer) return;
+        const lang = translations[currentLanguage];
+
+        // Assets
+        const cashInHand = (retailer.cashFlow || []).reduce((balance, entry) => {
+            if (['in', 'credit_customer', 'credit_supplier'].includes(entry.type)) return balance + entry.amount;
+            if (['out', 'debit_customer', 'debit_supplier'].includes(entry.type)) return balance - entry.amount;
+            return balance;
+        }, 0);
+        
+        const accountsReceivable = (retailer.customers || []).reduce((total, customer) => {
+            const balance = getPartyBalance('customer', customer.id);
+            return total + (balance > 0 ? balance : 0);
+        }, 0);
+        
+        const stockValue = (retailer.inventory || []).reduce((total, item) => total + (item.purchasePrice || 0) * item.quantity, 0);
+        
+        const totalAssets = cashInHand + accountsReceivable + stockValue;
+
+        // Liabilities
+        const accountsPayable = (retailer.suppliers || []).reduce((total, supplier) => {
+            const balance = getPartyBalance('supplier', supplier.id);
+            return total + (balance > 0 ? balance : 0);
+        }, 0);
+        
+        const capital = totalAssets - accountsPayable; // Simplified capital calculation
+        const totalLiabilities = accountsPayable + capital;
+
+        const container = document.getElementById('balanceSheetContainer');
+        container.innerHTML = `
+            <div class="balance-sheet-col">
+                <table class="data-table">
+                    <thead><tr><th colspan="2">${lang.liabilities}</th></tr></thead>
+                    <tbody>
+                        <tr><td>${lang.accountsPayable}</td><td style="text-align:right;">₹${accountsPayable.toFixed(2)}</td></tr>
+                        <tr><td>${lang.capital}</td><td style="text-align:right;">₹${capital.toFixed(2)}</td></tr>
+                    </tbody>
+                    <tfoot>
+                        <tr><td>${lang.totalLiabilities}</td><td style="text-align:right;">₹${totalLiabilities.toFixed(2)}</td></tr>
+                    </tfoot>
+                </table>
+            </div>
+            <div class="balance-sheet-col">
+                 <table class="data-table">
+                    <thead><tr><th colspan="2">${lang.assets}</th></tr></thead>
+                    <tbody>
+                        <tr><td>${lang.accountsReceivable}</td><td style="text-align:right;">₹${accountsReceivable.toFixed(2)}</td></tr>
+                        <tr><td>${lang.stockValue}</td><td style="text-align:right;">₹${stockValue.toFixed(2)}</td></tr>
+                        <tr><td>${lang.cashInHand}</td><td style="text-align:right;">₹${cashInHand.toFixed(2)}</td></tr>
+                    </tbody>
+                    <tfoot>
+                        <tr><td>${lang.totalAssets}</td><td style="text-align:right;">₹${totalAssets.toFixed(2)}</td></tr>
+                    </tfoot>
+                </table>
+            </div>
+        `;
+    };
+    
+    const populateLedgerAccounts = () => {
+        const retailer = allRetailerData[currentUserEmail];
+        const lang = translations[currentLanguage];
+        const select = document.getElementById('ledgerAccountSelect');
+        select.innerHTML = ''; // Clear previous options
+        
+        // Add core accounts
+        const coreAccounts = {
+            'Cash': lang.cash,
+            'Sales': lang.sellTab,
+            'Purchases': lang.purchaseTab,
+            'Expenses': lang.expensesTab
+        };
+        for(const [key, value] of Object.entries(coreAccounts)) {
+            select.innerHTML += `<option value="${key}">${value}</option>`;
+        }
+        
+        // Add customers
+        (retailer.customers || []).forEach(c => {
+            select.innerHTML += `<option value="customer-${c.id}">${c.name} (${lang.customersTab})</option>`;
+        });
+
+        // Add suppliers
+        (retailer.suppliers || []).forEach(s => {
+            select.innerHTML += `<option value="supplier-${s.id}">${s.name} (${lang.suppliersTab})</option>`;
+        });
+    };
+
+    const renderLedger = (accountName) => {
+        const retailer = allRetailerData[currentUserEmail];
+        const lang = translations[currentLanguage];
+        const body = document.getElementById('ledgerTableBody');
+        body.innerHTML = '';
+        if (!retailer || !accountName) return;
+
+        let entries = [];
+        let balance = 0;
+        
+        const [type, id] = accountName.split('-');
+
+        if (accountName === 'Cash') {
+            entries = (retailer.cashFlow || []).map(e => ({...e, date: new Date(e.date)}));
+            entries.sort((a,b) => a.date - b.date);
+            body.innerHTML = entries.map(e => {
+                let debit = 0, credit = 0;
+                if (['in', 'credit_customer', 'credit_supplier'].includes(e.type)) { credit = e.amount; balance += e.amount; }
+                if (['out', 'debit_customer', 'debit_supplier'].includes(e.type)) { debit = e.amount; balance -= e.amount; }
+                return `<tr><td>${e.date.toLocaleDateString()}</td><td>${e.notes || '-'}</td><td class="debit-col">₹${debit.toFixed(2)}</td><td class="credit-col">₹${credit.toFixed(2)}</td><td>₹${balance.toFixed(2)}</td></tr>`;
+            }).reverse().join('');
+        } else if (accountName === 'Sales') {
+            entries = (retailer.bills || []);
+             entries.forEach(b => {
+                 const [d, m, y] = b.date.split('-');
+                 const billDate = new Date(`${y}-${m}-${d}`);
+                 const customer = retailer.customers.find(c=>c.id === b.customerId)?.name || '';
+                 balance += b.total;
+                 body.innerHTML += `<tr><td>${billDate.toLocaleDateString()}</td><td class="ledger-particular" onclick="app.viewTransactionFromLedger('bill', '${b.billNo}')">${customer} - Bill #${b.billNo}</td><td class="debit-col"></td><td class="credit-col">₹${b.total.toFixed(2)}</td><td>₹${balance.toFixed(2)}</td></tr>`;
+             });
+        } else if (accountName === 'Purchases') {
+             entries = (retailer.purchaseEntries || []);
+             entries.forEach(p => {
+                 const purchaseDate = new Date(p.date);
+                 const supplier = retailer.suppliers.find(s=>s.id === p.supplierId)?.name || '';
+                 const total = (p.item.totalPrice * p.item.quantity);
+                 balance += total;
+                 body.innerHTML += `<tr><td>${purchaseDate.toLocaleDateString()}</td><td class="ledger-particular" onclick="app.viewTransactionFromLedger('purchase', ${p.id})">${supplier} - Purchase #${p.id}</td><td class="debit-col">₹${total.toFixed(2)}</td><td class="credit-col"></td><td>₹${balance.toFixed(2)}</td></tr>`;
+             });
+        } else if (accountName === 'Expenses') {
+            entries = (retailer.expenses || []);
+             entries.forEach(e => {
+                 const expenseDate = new Date(e.date);
+                 balance += e.amount;
+                 body.innerHTML += `<tr><td>${expenseDate.toLocaleDateString()}</td><td>${e.description}</td><td class="debit-col">₹${e.amount.toFixed(2)}</td><td class="credit-col"></td><td>₹${balance.toFixed(2)}</td></tr>`;
+             });
+        } else if (type === 'customer' || type === 'supplier') {
+            const partyId = `${type}-${id}`;
+            const partyEntries = (retailer.cashFlow || []).filter(e => e.partyId === partyId).map(e => ({...e, date: new Date(e.date)}));
+            partyEntries.sort((a,b) => a.date - b.date);
+            
+            partyEntries.forEach(e => {
+                let debit = 0, credit = 0;
+                let particular = e.notes || '';
+                let transactionType = '';
+                let transactionId = '';
+                if(e.notes.includes('Bill No:')) {
+                    transactionType = 'bill';
+                    transactionId = e.notes.split('Bill No: ')[1];
+                    particular = `<span class="ledger-particular" onclick="app.viewTransactionFromLedger('${transactionType}', '${transactionId}')">${e.notes}</span>`;
+                } else if (e.notes.includes('Purchase No:')) {
+                     transactionType = 'purchase';
+                     transactionId = e.notes.split('Purchase No: ')[1];
+                     particular = `<span class="ledger-particular" onclick="app.viewTransactionFromLedger('${transactionType}', ${transactionId})">${e.notes}</span>`;
+                }
+
+
+                if (type === 'customer') {
+                    if (e.type === 'debit_customer') { debit = e.amount; balance += e.amount; }
+                    if (e.type === 'credit_customer') { credit = e.amount; balance -= e.amount; }
+                } else { // supplier
+                    if (e.type === 'credit_supplier') { credit = e.amount; balance += e.amount; }
+                    if (e.type === 'debit_supplier') { debit = e.amount; balance -= e.amount; }
+                }
+                body.innerHTML = `<tr><td>${e.date.toLocaleDateString()}</td><td>${particular}</td><td class="debit-col">${debit > 0 ? '₹'+debit.toFixed(2) : ''}</td><td class="credit-col">${credit > 0 ? '₹'+credit.toFixed(2) : ''}</td><td>₹${balance.toFixed(2)}</td></tr>` + body.innerHTML;
+            });
+        }
+    };
+    
+    app.viewTransactionFromLedger = (type, id) => {
+        if (type === 'bill') {
+            app.reprintBill(id);
+        } else if (type === 'purchase') {
+            app.showPurchaseSlipPreview(id);
+        }
+    };
+
 
     const attachAllEventListeners = () => {
         document.getElementById('goToLoginBtn').addEventListener('click', () => showPage('login-page'));
@@ -2898,6 +3145,9 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('salesHistoryToDate').addEventListener('input', renderRecentSales);
         document.getElementById('purchaseHistoryFromDate').addEventListener('input', renderPurchaseHistory);
         document.getElementById('purchaseHistoryToDate').addEventListener('input', renderPurchaseHistory);
+        
+        // Ledger Dropdown Listener
+        document.getElementById('ledgerAccountSelect').addEventListener('change', (e) => renderLedger(e.target.value));
 
         document.querySelectorAll('input[name="gstType"]').forEach(radio => {
             radio.addEventListener('change', (e) => {
