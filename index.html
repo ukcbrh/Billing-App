@@ -114,7 +114,7 @@
         #purchase-tab, #purchase-tab input, #purchase-tab select, #purchase-tab textarea { font-family: 'Segoe UI', sans-serif; }
         .profile-image-upload { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; margin-top: 10px; }
         .profile-image-upload img { max-width: 150px; max-height: 80px; border: 1px solid var(--border-color); padding: 5px; }
-        #item-details-calculator, #purchase-item-calculator { border: 1px solid var(--border-color); padding: 15px; margin-top: 15px; border-radius: 5px; }
+        #item-details-calculator, #purchase-item-calculator, #productServiceItemCalculator { border: 1px solid var(--border-color); padding: 15px; margin-top: 15px; border-radius: 5px; }
         .item-calc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .item-calc-grid label { margin-bottom: 5px; }
         .item-calc-grid input { margin-bottom: 5px; }
@@ -124,7 +124,7 @@
         .close-sidebar-btn { position: absolute; top: 10px; right: 15px; font-size: 2.5rem; font-weight: bold; line-height: 1; color: var(--text-color); background: transparent; border: none; cursor: pointer; padding: 0; width: auto; margin: 0; }
         .cashflow-in { color: #27ae60; font-weight: bold; }
         .cashflow-out { color: #e74c3c; font-weight: bold; }
-        #sell-inventory-list-container { max-height: 400px; overflow-y: auto; margin-top: 20px; }
+        #sell-inventory-list-container, #productServiceInventoryListContainer { max-height: 400px; overflow-y: auto; margin-top: 20px; }
         .balance-display { text-align: right; font-size: 1.2em; padding: 10px; margin: 10px 0; border-radius: 5px; font-weight: bold; }
         .balance-due { background-color: var(--balance-due-bg); color: var(--balance-due-text); }
         .balance-payable { background-color: var(--balance-payable-bg); color: var(--balance-payable-text); }
@@ -201,6 +201,7 @@
             <span class="tab-link" data-tab="sell" data-lang-key="sellTab">बिक्री</span>
             <span class="tab-link" data-tab="estimate" data-lang-key="estimateTab">एस्टीमेट</span>
             <span class="tab-link" data-tab="purchase" data-lang-key="purchaseTab">खरीद</span>
+            <span class="tab-link" data-tab="product-service" data-lang-key="productServiceTab">उत्पाद/सेवा</span>
             <span class="tab-link" data-tab="inventory" data-lang-key="inventoryTab">इन्वेंटरी</span>
             <span class="tab-link" data-tab="cashflow" data-lang-key="cashFlowTab">कैश फ्लो</span>
             <span class="tab-link" data-tab="expenses" data-lang-key="expensesTab">खर्चे</span>
@@ -467,6 +468,102 @@
                     </div>
                      <p data-lang-key="selectSupplierToViewHistory" style="text-align:center; font-style:italic;">आपूर्तिकर्ता की सभी खरीद देखने के लिए 'आपूर्तिकर्ता' टैब पर जाएं।</p>
                      <div id="tabPurchaseHistoryContainer" style="max-height: 450px; overflow-y: auto;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- उत्पाद/सेवा टैब (नया) -->
+        <div id="product-service-tab" class="tab-content">
+            <div class="main-layout">
+                <div>
+                    <h4 id="product-service-form-title" data-lang-key="addProductServiceTitle">नया उत्पाद/सेवा जोड़ें</h4>
+                    <form id="productServiceForm">
+                        <div class="purchase-form-grid">
+                           <div>
+                                <label data-lang-key="productName">उत्पाद का नाम</label>
+                                <input type="text" id="productServiceProductName" required>
+                           </div>
+                           <div>
+                                <label data-lang-key="hsnSac">HSN/SAC:</label>
+                                <input type="text" id="productServiceHsnSac">
+                           </div>
+                        </div>
+                        
+                        <div id="productServiceItemCalculator">
+                            <h5 data-lang-key="purchasePriceDetails" style="border:none; margin-top:0;">खरीद मूल्य विवरण</h5>
+                            <div class="radio-group" style="margin-bottom:10px;">
+                                <label><input type="radio" name="productServiceGstType" value="without_gst" checked> <span data-lang-key="withoutGst">बिना GST</span></label>
+                                <label><input type="radio" name="productServiceGstType" value="with_gst"> <span data-lang-key="withGst">GST सहित</span></label>
+                            </div>
+                            <div class="item-calc-grid">
+                                <div>
+                                    <label data-lang-key="basePrice">बेस प्राइस/यूनिट (₹)</label>
+                                    <input type="number" id="productServiceBasePrice" required min="0" step="0.01">
+                                </div>
+                                <div id="product-service-gst-field-container" class="hidden">
+                                    <label data-lang-key="gstPercent">GST (%)</label>
+                                    <input type="number" id="productServiceGstPercent" min="0" step="0.01" value="0">
+                                </div>
+                            </div>
+                            <div>
+                                <label data-lang-key="totalPurchasePrice">कुल खरीद मूल्य/यूनिट (₹)</label>
+                                <input type="number" id="productServiceTotalPrice" required min="0" step="0.01">
+                            </div>
+
+                            <hr style="margin:15px 0;">
+                            <h5 data-lang-key="sellingPriceDetails" style="border:none;">बिक्री मूल्य विवरण</h5>
+                            
+                            <div class="purchase-form-grid" style="align-items: flex-end;">
+                                <div>
+                                    <label data-lang-key="profitMargin">लाभ मार्जिन</label>
+                                    <input type="number" id="productServiceProfitMarginValue" value="0" min="0" step="0.01">
+                                </div>
+                                <div>
+                                    <select id="productServiceProfitMarginType" style="margin-bottom: 0;">
+                                        <option value="percent">%</option>
+                                        <option value="fixed">₹</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div>
+                                <label data-lang-key="sellingPriceLabel">बिक्री मूल्य/यूनिट (₹)</label>
+                                <input type="number" id="productServiceSellingPrice" required min="0" step="0.01" readonly>
+                            </div>
+                        </div>
+
+                        <div class="purchase-form-grid" style="margin-top:15px;">
+                            <div>
+                                <label data-lang-key="quantity">प्रारंभिक स्टॉक</label>
+                                <input type="number" id="productServiceQuantity" required min="0" step="0.01">
+                            </div>
+                            <div>
+                                <label data-lang-key="unitLabel">इकाई</label>
+                                <select id="productServiceUnit">
+                                    <option>Pcs</option><option>Kg</option><option>Gm</option>
+                                    <option>Ltr</option><option>Mtr</option>
+                                </select>
+                            </div>
+                        </div>
+                         <button type="submit" id="productServiceSubmitBtn" style="margin-top: 10px;" data-lang-key="addProductBtn">उत्पाद जोड़ें</button>
+                    </form>
+                </div>
+                <div>
+                     <h4 data-lang-key="inventoryTab">उत्पाद सूची</h4>
+                     <div id="productServiceInventoryListContainer">
+                        <div style="overflow-x:auto;">
+                            <table class="data-table" id="productServiceStockTable">
+                                <thead>
+                                    <tr>
+                                        <th data-lang-key="productColumn">उत्पाद</th>
+                                        <th data-lang-key="inStock">स्टॉक में</th>
+                                        <th data-lang-key="priceLabel">बिक्री मूल्य</th>
+                                        <th data-lang-key="actionColumn">एक्शन</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="productServiceStockTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -853,7 +950,8 @@ document.addEventListener('DOMContentLoaded', () => {
             mobileLabel: "मोबाइल:", passwordLabel: "पासवर्ड:", signUp: "साइन अप", emailOrMobileLabel: "ईमेल या मोबाइल:", logout: "लॉगआउट", 
             dashboardTab: "डैशबोर्ड", sellTab: "बिक्री", purchaseTab: "खरीद", inventoryTab: "इन्वेंटरी", expensesTab: "खर्चे", 
             customersTab: "ग्राहक", suppliersTab: "आपूर्तिकर्ता", profileTab: "प्रोफ़ाइल", backupRestoreTab: "बैकअप/रिस्टोर",
-            reportsTab: "रिपोर्ट्स", estimateTab: "एस्टीमेट", customerDetails: "ग्राहक का विवरण", customerName: "ग्राहक का नाम:", 
+            reportsTab: "रिपोर्ट्स", estimateTab: "एस्टीमेट", productServiceTab: "उत्पाद/सेवा", addProductServiceTitle: "नया उत्पाद/सेवा जोड़ें",
+            addProductBtn: "उत्पाद जोड़ें", customerDetails: "ग्राहक का विवरण", customerName: "ग्राहक का नाम:", 
             customerPhone: "ग्राहक का फ़ोन:", customerAddress: "ग्राहक का पता:", addItem: "आइटम जोड़ें", addProductLabel: "उत्पाद खोजें:", 
             quantity: "मात्रा:", addToBill: "बिल में जोड़ें", currentBill: "वर्तमान बिल", productColumn: "उत्पाद/सर्विस", 
             quantityColumn: "मात्रा", priceColumn: "मूल्य", totalColumn: "कुल", rateColumn: "दर", subTotal: "उप-योग (Subtotal):", 
@@ -938,7 +1036,8 @@ document.addEventListener('DOMContentLoaded', () => {
             mobileLabel: "Mobile:", passwordLabel: "Password:", signUp: "Sign Up", emailOrMobileLabel: "Email or Mobile:", logout: "Logout",
             dashboardTab: "Dashboard", sellTab: "Sell", purchaseTab: "Purchase", inventoryTab: "Inventory", expensesTab: "Expenses",
             customersTab: "Customers", suppliersTab: "Suppliers", profileTab: "Profile", backupRestoreTab: "Backup/Restore",
-            reportsTab: "Reports", estimateTab: "Estimate", customerDetails: "Customer Details", customerName: "Customer Name:",
+            reportsTab: "Reports", estimateTab: "Estimate", productServiceTab: "Product/Service", addProductServiceTitle: "Add New Product/Service",
+            addProductBtn: "Add Product", customerDetails: "Customer Details", customerName: "Customer Name:",
             customerPhone: "Customer Phone:", customerAddress: "Customer Address:", addItem: "Add Item", addProductLabel: "Search Product:",
             quantity: "Quantity:", addToBill: "Add to Bill", currentBill: "Current Bill", productColumn: "Product/Service",
             quantityColumn: "Qty", priceColumn: "Price", totalColumn: "Total", rateColumn: "Rate", subTotal: "Subtotal:",
@@ -1017,7 +1116,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     
     // --- ग्लोबल वेरिएबल्स ---
-    let allRetailerData = {}, currentUserEmail = null, currentBillItems = [], billCounter = 1, productForCalculator = null, currentLanguage = 'hi', editingInventoryItemId = null, currentBillForModal = null, editingSupplierId = null, editingCustomerId = null, editingBillId = null, editingPurchaseId = null, editingCashFlowId = null, lastActiveTab = 'dashboard';
+    let allRetailerData = {}, currentUserEmail = null, currentBillItems = [], billCounter = 1, productForCalculator = null, currentLanguage = 'hi', editingInventoryItemId = null, editingProductServiceId = null, currentBillForModal = null, editingSupplierId = null, editingCustomerId = null, editingBillId = null, editingPurchaseId = null, editingCashFlowId = null, lastActiveTab = 'dashboard';
     let cropper, currentCropTarget;
     let salesChart, purchaseChart, profitLossChart;
     let currentEstimateItems = [], estimateCounter = 1;
@@ -1082,6 +1181,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (tabName === 'dashboard') renderDashboard();
         if (tabName === 'inventory') renderInventoryTable();
+        if (tabName === 'product-service') renderProductServiceTab();
         if (tabName === 'reports') {
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('salesReportToDate').value = today;
@@ -1242,6 +1342,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const retailer = allRetailerData[currentUserEmail];
         document.getElementById('retailerShopName').innerText = retailer.shopDetails.name;
         renderInventoryTable();
+        renderProductServiceList();
         renderSupplierTable();
         renderProfile();
         renderCustomerTable();
@@ -1311,8 +1412,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td data-col-name="purchaseValue">₹${itemPurchaseValue.toFixed(2)}</td>
                 <td data-col-name="saleValue">₹${itemSaleValue.toFixed(2)}</td>
                 <td data-col-name="actionColumn">
-                    <button class="action-button edit" onclick="window.app.editStockItem(${item.id})">${lang.editBtn}</button>
-                    <button class="action-button delete" onclick="window.app.deleteProduct(${item.id})">${lang.deleteBtn}</button>
+                    <button class="action-button edit" onclick="window.app.editProductFromInventory(${item.id})">${lang.editBtn}</button>
+                    <button class="action-button delete" onclick="window.app.deleteProductService(${item.id})">${lang.deleteBtn}</button>
                 </td>
             </tr>`;
         }).join('');
@@ -1463,16 +1564,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         saveData(); alert(translations[currentLanguage].signupSuccess); e.target.reset(); showPage('login-page');
     };
-    
-    app.deleteProduct = (productId) => {
-        if (confirm(translations[currentLanguage].deleteConfirm)) {
-            const retailerData = allRetailerData[currentUserEmail];
-            retailerData.inventory = retailerData.inventory.filter(p => p.id !== productId);
-            saveData(); 
-            renderAllUI();
-        }
-    };
-    
+        
     const handlePrintStock = () => {
         const printContent = document.getElementById('inventoryToPrint').innerHTML;
         const shopName = allRetailerData[currentUserEmail].shopDetails.name;
@@ -2225,47 +2317,9 @@ document.addEventListener('DOMContentLoaded', () => {
         editingInventoryItemId = null;
     };
     
-    app.editStockItem = (itemId) => {
-        const retailer = allRetailerData[currentUserEmail];
-        const item = retailer.inventory.find(i => i.id === itemId);
-        if (!item) return;
-
-        editingInventoryItemId = itemId;
-        showTab('purchase');
-
-        document.getElementById('supplier-details-fieldset').disabled = true;
-        document.getElementById('purchaseQuantity').disabled = true;
-        document.getElementById('purchaseUnit').disabled = true;
-
-        document.getElementById('purchaseProductName').value = item.name;
-        document.getElementById('purchaseHsnSac').value = item.hsnSac || '';
-
-        const gstPercent = item.gstPercent || 0;
-        const totalPrice = item.purchasePrice || 0;
-        const basePrice = totalPrice / (1 + (gstPercent / 100));
-        
-        if (gstPercent > 0) {
-            document.querySelector('input[name="gstType"][value="with_gst"]').checked = true;
-            document.getElementById('gst-field-container').classList.remove('hidden');
-        } else {
-            document.querySelector('input[name="gstType"][value="without_gst"]').checked = true;
-            document.getElementById('gst-field-container').classList.add('hidden');
-        }
-
-        document.getElementById('purchaseBasePrice').value = basePrice.toFixed(2);
-        document.getElementById('purchaseGstPercent').value = gstPercent;
-        document.getElementById('purchaseTotalPrice').value = totalPrice.toFixed(2);
-        
-        document.getElementById('purchaseProfitMarginValue').value = item.profitMarginValue || 0;
-        document.getElementById('purchaseProfitMarginType').value = item.profitMarginType || 'percent';
-        document.getElementById('purchaseSellingPrice').value = item.price.toFixed(2);
-        
-        document.getElementById('purchaseQuantity').value = item.quantity;
-        document.getElementById('purchaseUnit').value = item.unit;
-        
-        const submitBtn = document.getElementById('purchaseSubmitBtn');
-        submitBtn.innerText = translations[currentLanguage].updateBtn;
-        submitBtn.removeAttribute('data-lang-key');
+    app.editProductFromInventory = (itemId) => {
+        showTab('product-service');
+        app.editProductService(itemId);
     };
     
     const generatePurchaseSlipHTML = (purchaseEntry) => {
@@ -3080,6 +3134,182 @@ document.addEventListener('DOMContentLoaded', () => {
             app.showPurchaseSlipPreview(id);
         }
     };
+    
+    // --- उत्पाद/सेवा टैब फंक्शन (नया) ---
+    const renderProductServiceTab = () => {
+        renderProductServiceList();
+        resetProductServiceForm();
+    };
+
+    const renderProductServiceList = () => {
+        const inventory = allRetailerData[currentUserEmail]?.inventory || [];
+        const lang = translations[currentLanguage];
+        const tableBody = document.getElementById('productServiceStockTableBody');
+        tableBody.innerHTML = inventory.map(item => `
+            <tr>
+                <td>${item.name}</td>
+                <td>${item.quantity} ${item.unit}</td>
+                <td>₹${item.price.toFixed(2)}</td>
+                <td>
+                    <button class="action-button edit" onclick="app.editProductService(${item.id})">${lang.editBtn}</button>
+                    <button class="action-button delete" onclick="app.deleteProductService(${item.id})">${lang.deleteBtn}</button>
+                </td>
+            </tr>
+        `).join('');
+    };
+
+    const calculateProductServicePrices = (source) => {
+        const gstType = document.querySelector('input[name="productServiceGstType"]:checked').value;
+        const basePriceEl = document.getElementById('productServiceBasePrice');
+        const gstPercentEl = document.getElementById('productServiceGstPercent');
+        const totalPriceEl = document.getElementById('productServiceTotalPrice');
+        const profitValueEl = document.getElementById('productServiceProfitMarginValue');
+        const profitTypeEl = document.getElementById('productServiceProfitMarginType');
+        const sellingPriceEl = document.getElementById('productServiceSellingPrice');
+
+        let basePrice = parseFloat(basePriceEl.value) || 0;
+        let gstPercent = (gstType === 'with_gst') ? (parseFloat(gstPercentEl.value) || 0) : 0;
+        let totalPrice = parseFloat(totalPriceEl.value) || 0;
+
+        if (source === 'base' || source === 'gst') {
+            totalPrice = basePrice * (1 + (gstPercent / 100));
+            if(totalPrice >= 0) totalPriceEl.value = totalPrice.toFixed(2);
+        } else if (source === 'total') {
+            basePrice = gstPercent > 0 ? totalPrice / (1 + (gstPercent / 100)) : totalPrice;
+            if(basePrice >= 0) basePriceEl.value = basePrice.toFixed(2);
+        }
+        
+        let profitValue = parseFloat(profitValueEl.value) || 0;
+        let profitType = profitTypeEl.value;
+        let finalSellingPrice = 0;
+        
+        const purchasePriceForProfitCalc = parseFloat(totalPriceEl.value) || 0;
+
+        if (profitType === 'percent') {
+            finalSellingPrice = purchasePriceForProfitCalc * (1 + (profitValue / 100));
+        } else {
+            finalSellingPrice = purchasePriceForProfitCalc + profitValue;
+        }
+        if(finalSellingPrice >= 0) sellingPriceEl.value = finalSellingPrice.toFixed(2);
+    };
+    
+    const handleAddOrUpdateProductService = (e) => {
+        e.preventDefault();
+        const retailerData = allRetailerData[currentUserEmail];
+        const lang = translations[currentLanguage];
+        
+        const productName = document.getElementById('productServiceProductName').value.trim();
+        const hsnSac = document.getElementById('productServiceHsnSac').value.trim();
+        const quantity = parseFloat(document.getElementById('productServiceQuantity').value);
+        const unit = document.getElementById('productServiceUnit').value;
+
+        const basePrice = parseFloat(document.getElementById('productServiceBasePrice').value);
+        const gstPercent = parseFloat(document.getElementById('productServiceGstPercent').value) || 0;
+        const totalPrice = parseFloat(document.getElementById('productServiceTotalPrice').value);
+        const profitMarginValue = parseFloat(document.getElementById('productServiceProfitMarginValue').value) || 0;
+        const profitMarginType = document.getElementById('productServiceProfitMarginType').value;
+        const sellingPrice = parseFloat(document.getElementById('productServiceSellingPrice').value);
+
+        if (!productName || isNaN(quantity) || isNaN(totalPrice) || isNaN(sellingPrice)) {
+            alert(lang.fillAllFields);
+            return;
+        }
+
+        const productObject = {
+            name: productName,
+            hsnSac: hsnSac,
+            quantity: quantity,
+            unit: unit,
+            basePrice: basePrice,
+            gstPercent: gstPercent,
+            purchasePrice: totalPrice,
+            profitMarginValue: profitMarginValue,
+            profitMarginType: profitMarginType,
+            price: sellingPrice
+        };
+
+        if (editingProductServiceId) {
+            // Edit mode
+            const itemToUpdate = retailerData.inventory.find(item => item.id === editingProductServiceId);
+            if (itemToUpdate) {
+                Object.assign(itemToUpdate, { ...productObject, id: editingProductServiceId });
+                alert(lang.productUpdatedSuccess);
+            }
+        } else {
+            // Add mode
+            const existingItem = retailerData.inventory.find(item => item.name.toLowerCase() === productName.toLowerCase());
+            if (existingItem) {
+                alert("इस नाम का उत्पाद पहले से मौजूद है। आप सूची से इसे संपादित कर सकते हैं।");
+                return;
+            }
+            retailerData.inventory.push({ ...productObject, id: Date.now() });
+            alert(lang.productAddedSuccess);
+        }
+
+        saveData();
+        renderProductServiceList();
+        renderInventoryTable();
+        renderDashboard();
+        resetProductServiceForm();
+    };
+
+    const resetProductServiceForm = () => {
+        document.getElementById('productServiceForm').reset();
+        editingProductServiceId = null;
+        const submitBtn = document.getElementById('productServiceSubmitBtn');
+        const title = document.getElementById('product-service-form-title');
+        submitBtn.innerText = translations[currentLanguage].addProductBtn;
+        title.innerText = translations[currentLanguage].addProductServiceTitle;
+        submitBtn.dataset.langKey = 'addProductBtn';
+        title.dataset.langKey = 'addProductServiceTitle';
+        document.getElementById('productServiceQuantity').disabled = false;
+    };
+    
+    app.editProductService = (itemId) => {
+        const item = allRetailerData[currentUserEmail].inventory.find(i => i.id === itemId);
+        if (!item) return;
+        
+        editingProductServiceId = itemId;
+        
+        document.getElementById('productServiceProductName').value = item.name;
+        document.getElementById('productServiceHsnSac').value = item.hsnSac || '';
+        document.getElementById('productServiceQuantity').value = item.quantity;
+        document.getElementById('productServiceUnit').value = item.unit;
+        
+        document.getElementById('productServiceBasePrice').value = (item.basePrice || 0).toFixed(2);
+        document.getElementById('productServiceGstPercent').value = item.gstPercent || 0;
+        document.getElementById('productServiceTotalPrice').value = (item.purchasePrice || 0).toFixed(2);
+        
+        document.getElementById('productServiceProfitMarginValue').value = item.profitMarginValue || 0;
+        document.getElementById('productServiceProfitMarginType').value = item.profitMarginType || 'percent';
+        document.getElementById('productServiceSellingPrice').value = (item.price || 0).toFixed(2);
+
+        if ((item.gstPercent || 0) > 0) {
+            document.querySelector('input[name="productServiceGstType"][value="with_gst"]').checked = true;
+            document.getElementById('product-service-gst-field-container').classList.remove('hidden');
+        } else {
+            document.querySelector('input[name="productServiceGstType"][value="without_gst"]').checked = true;
+            document.getElementById('product-service-gst-field-container').classList.add('hidden');
+        }
+        
+        document.getElementById('productServiceQuantity').disabled = true; // Can't edit initial quantity here, must be done via purchase/adjustment
+
+        const submitBtn = document.getElementById('productServiceSubmitBtn');
+        const title = document.getElementById('product-service-form-title');
+        submitBtn.innerText = translations[currentLanguage].updateBtn;
+        title.innerText = `${translations[currentLanguage].editBtn} ${item.name}`;
+        submitBtn.removeAttribute('data-lang-key');
+        title.removeAttribute('data-lang-key');
+    };
+    
+    app.deleteProductService = (itemId) => {
+        if (confirm(translations[currentLanguage].deleteConfirm)) {
+            const retailerData = allRetailerData[currentUserEmail];
+            retailerData.inventory = retailerData.inventory.filter(p => p.id !== itemId);
+            saveData();
+            renderAllUI();
+        }
+    };
 
 
     const attachAllEventListeners = () => {
@@ -3128,6 +3358,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('addExpenseForm').addEventListener('submit', handleAddExpense);
         document.getElementById('addCashFlowForm').addEventListener('submit', handleAddCashFlow);
         document.getElementById('addPurchaseItemForm').addEventListener('submit', handleAddPurchaseEntry);
+        document.getElementById('productServiceForm').addEventListener('submit', handleAddOrUpdateProductService);
 
         document.getElementById('createBackupBtn').addEventListener('click', handleCreateBackup);
         document.getElementById('restoreBackupBtn').addEventListener('click', () => document.getElementById('restoreFileInput').click());
@@ -3167,6 +3398,25 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('purchaseTotalPrice').addEventListener('input', () => calculatePurchasePrices('total'));
         document.getElementById('purchaseProfitMarginValue').addEventListener('input', () => calculatePurchasePrices('profit'));
         document.getElementById('purchaseProfitMarginType').addEventListener('change', () => calculatePurchasePrices('profit'));
+        
+        // Product/Service Tab Calculator Listeners
+        document.querySelectorAll('input[name="productServiceGstType"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                const gstField = document.getElementById('product-service-gst-field-container');
+                if (e.target.value === 'with_gst') {
+                    gstField.classList.remove('hidden');
+                } else {
+                    gstField.classList.add('hidden');
+                    document.getElementById('productServiceGstPercent').value = 0;
+                }
+                calculateProductServicePrices('gst');
+            });
+        });
+        document.getElementById('productServiceBasePrice').addEventListener('input', () => calculateProductServicePrices('base'));
+        document.getElementById('productServiceGstPercent').addEventListener('input', () => calculateProductServicePrices('base'));
+        document.getElementById('productServiceTotalPrice').addEventListener('input', () => calculateProductServicePrices('total'));
+        document.getElementById('productServiceProfitMarginValue').addEventListener('input', () => calculateProductServicePrices('profit'));
+        document.getElementById('productServiceProfitMarginType').addEventListener('change', () => calculateProductServicePrices('profit'));
 
 
         document.querySelectorAll('input[name="serviceGstType"]').forEach(radio => {
@@ -3455,10 +3705,15 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('dynamic-print-style').innerHTML = styleText;
             printArea.innerHTML = billContentHTML;
             
-            window.print();
-            
-            printArea.innerHTML = ''; // Clean up after print
-            document.getElementById('dynamic-print-style').innerHTML = '';
+            // --- FIX START ---
+            // Add a small delay to ensure content is rendered before printing
+            setTimeout(() => {
+                window.print();
+                // Clean up after print dialog is closed
+                printArea.innerHTML = ''; 
+                document.getElementById('dynamic-print-style').innerHTML = '';
+            }, 250);
+            // --- FIX END ---
         });
 
         document.getElementById('theme-toggle-sidebar').addEventListener('change', handleThemeToggle);
@@ -3517,7 +3772,7 @@ document.addEventListener('DOMContentLoaded', () => {
         toDate = new Date(toDate); toDate.setHours(23, 59, 59, 999);
         const filteredBills = (retailer.bills || []).filter(bill => { const [d, m, y] = bill.date.split('-'); return new Date(`${y}-${m}-${d}`) >= fromDate && new Date(`${y}-${m}-${d}`) <= toDate; });
         if (filteredBills.length === 0) { alert(lang.noDataFound); return; }
-        const headers = [lang.billNo, lang.billDate, lang.customerName, lang.total];
+        const headers = [lang.billNo, lang.date, lang.customerName, lang.total];
         const data = filteredBills.map(bill => [bill.billNo, bill.date, (retailer.customers.find(c => c.id === bill.customerId) || {}).name || 'N/A', bill.total.toFixed(2)]);
         const reportTitle = `${lang.salesReportTitle} (${fromDate.toLocaleDateString()} - ${toDate.toLocaleDateString()})`;
         if (format === 'pdf') {
